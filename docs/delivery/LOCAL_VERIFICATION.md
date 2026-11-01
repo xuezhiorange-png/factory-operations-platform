@@ -31,8 +31,8 @@
 | 本地 HTTP 冒烟 | PASS | Uvicorn liveness 200；Vite 首页 200；Vite /api 转发返回完整健康契约；业务 GET/POST 均 404 |
 | 浏览器渲染/移动端 | UNVERIFIED | 本轮未运行浏览器或真实手机测试，HTTP 200 不代表视觉/交互验收 |
 | PostgreSQL / Alembic / Compose | UNVERIFIED | M0 不连接数据库，无迁移；未启动 Compose |
-| GitHub 远程 Actions | PENDING | 已获目标仓库读写权限，推送后检查真实 backend/frontend/docs 作业；不以本地结果代替远程 CI |
-| Draft PR | PENDING | 在 main 基线上导入并推送后创建；链接和状态以远程证据为准 |
+| GitHub 远程 Actions | PASS | 首轮 push 与 PR 运行的 backend/frontend/docs 全部 success，SHA/运行链接见下 |
+| Draft PR | PASS | [PR #1](https://github.com/xuezhiorange-png/factory-operations-platform/pull/1)，base=main、head=codex/m0-bootstrap、draft=true、merged=false |
 | 飞书/监控实测 | UNVERIFIED | 无外部连接、登录、通知、SSO、webhook 或事件回放证据 |
 
 前端命令前缀（在 `frontend/`）：
@@ -59,16 +59,35 @@ httpx 0.28.1、pytest 9.2.0、Ruff 0.17.3。Starlette TestClient 提示使用 ht
 已将本地 M0 源码接到该基线上，旧本地根提交 `7afc652267ebd50479d983577b43b63c2020939a`
 仅作本地归档，不强推，不修改 main。
 
-仓库当前 Public，与原任务书 Private 要求不同。尝试调整可见性时 GitHub 返回 403；
-用户随后明确授权“按 Public 提交 M0 骨架”。按该最新授权提交源码、文档和合成示例，
+仓库当前 Public，与原任务书 Private 要求不同。
+用户明确授权“按 Public 提交 M0 骨架”。按该最新授权提交源码、文档和合成示例，
 不包含真实人员/设备/凭据/生产配置。原 AGENTS、PRD、任务书原文保留，例外在 README/ADR/清单中说明。
 
 main 分支目前未保护；本轮不擅自调整仓库策略。只创建 Draft PR、观察 Actions，
-不执行 Ready、合并、自动合并、强推或部署。PR 与实际 CI 运行证据将在推送后记录。
+不执行 Ready、合并、自动合并、强推或部署。
+
+## 已核实的远程 CI 与 PR
+
+已推送 M0 导入提交 `0707c26b276d6c9b4facb2bed02daed9394dbca6`，父提交为上述 main 基线。
+以下两轮均完成且 success，并已读取作业结果；push 日志与本地验证一致：
+
+| 事件 | 运行 | backend | frontend | docs |
+|---|---|---|---|---|
+| push | [41295392210](https://github.com/xuezhiorange-png/factory-operations-platform/actions/runs/41295392210) | success | success | success |
+| pull_request | [41295409730](https://github.com/xuezhiorange-png/factory-operations-platform/actions/runs/41295409730) | success | success | success |
+
+- Backend：32 passed、1 条 Starlette/httpx 弃用警告；Ruff 全通过。
+- Frontend：Node 22.23.4 / npm 10.9.9，npm ci、vue-tsc、Vite 7.3.7 构建通过。
+- Docs：27 个必备文件、26 个本地链接通过，外链/锚点未验证。
+- PR #1：OPEN / Draft，54 个变更文件，base=main；未合并，main 仍为初始化提交。
+
+此表记录初始导入 SHA 的真实证据。后续仅补充交付文档，最新提交的 CI 状态以
+[PR Checks](https://github.com/xuezhiorange-png/factory-operations-platform/pull/1/checks) 和 PR 正文中记录的 HEAD_SHA 为准，
+不能把旧提交的通过结果套用于新提交。
 
 ## 验证边界与后续
 
-VERIFIED 只包括本地源码、测试、依赖安装、构建、文档和 Actions 静态校验。
+VERIFIED 包括本地源码、测试、依赖安装、构建、文档、Actions 静态检查及上表真实远程运行/PR 元数据。
 DESIGN_REVIEWED 表示设计预留，不表示实现。
 M1 需要认证/撤权、实体工厂授权、Alembic、导入/附件及事务测试；M3 需要状态机、并发/幂等、
 审计/outbox 和独立验收集成测试。试点、飞书和监控需独立的外部授权及脱敏样本。

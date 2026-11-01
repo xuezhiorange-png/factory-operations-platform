@@ -6,7 +6,8 @@
 Head：`codex/m0-bootstrap` → Base：`main`  
 TASK_ID：`FACTORY_OPS_M0_BOOTSTRAP_DRAFT_PR`
 
-本文件保存可审阅正文；PR 创建与 CI 状态以验证记录和远程页面为准。
+已创建 [Draft PR #1](https://github.com/xuezhiorange-png/factory-operations-platform/pull/1)。
+本文件保存可审阅正文；最新 HEAD 与 Checks 以远程 PR 页面和正文证据为准。
 
 ## 本 PR 解决什么问题？
 
@@ -35,12 +36,17 @@ TASK_ID：`FACTORY_OPS_M0_BOOTSTRAP_DRAFT_PR`
 | `actionlint .github/workflows/ci.yml` | PASS（1.7.7）；不是远程 Actions 通过证据 |
 | Uvicorn/Vite HTTP 冒烟 | PASS；健康接口、开发代理、业务接口缺席 |
 
+首轮已验证 SHA：`0707c26b276d6c9b4facb2bed02daed9394dbca6`。
+远程 [push 运行](https://github.com/xuezhiorange-png/factory-operations-platform/actions/runs/41295392210) 与
+[PR 运行](https://github.com/xuezhiorange-png/factory-operations-platform/actions/runs/41295409730) 均为 success，
+三个作业全部通过：32 项后端测试/Ruff、npm ci/Vue 类型/Vite 构建、文档检查。
+
 详细环境、命令与限制：[LOCAL_VERIFICATION](LOCAL_VERIFICATION.md)。
 
 ## 未验证与风险
 
 用户明确授权在 Public 仓库提交本轮 M0 骨架；不含真实人员/设备/凭据或生产配置。
-远程 Actions 必须实测，本地结果不能代替远程 CI。
+首轮 push 和 pull_request 的三项远程作业均通过；最新提交以 PR Checks 为准。
 实际认证/会话撤权、业务数据库/迁移、事务回滚与并发尚未实现；不可生产使用。
 Python 依赖未完整锁定，当前测试客户端有弃用警告。未运行浏览器、移动端或 Compose。
 飞书租户/登录/人员同步/机器人、监控实际接口/SSO/webhook/告警映射均为 UNVERIFIED；

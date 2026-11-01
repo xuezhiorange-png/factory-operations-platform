@@ -14,7 +14,7 @@
 | 监控 | 只读端口、四类目标映射、有效期和人工确认、未知码队列 | DESIGN_REVIEWED；实际接口 UNVERIFIED |
 | 幂等/审计/outbox | 唯一键/请求指纹、版本号、状态+审计+outbox 同事务、至少一次投递及补偿 | DESIGN_REVIEWED；事务未实现 |
 | API 边界 | 只有 liveness，无业务接口；增加固定字面量契约与 OpenAPI 测试 | 本地测试 |
-| 前端/CI | npm 锁文件、Node 22、npm ci、类型/构建；CI 只读权限、超时、无部署 | 本地验证；远程状态另见验证记录 |
+| 前端/CI | npm 锁文件、Node 22、npm ci、类型/构建；CI 只读权限、超时、无部署 | 本地和首轮远程三个作业通过；SHA/链接见验证记录 |
 
 ## 原工程包缺口处理
 
@@ -26,8 +26,8 @@
 
 ## UNVERIFIED 与后续工作
 
-- GitHub 仓库可用性、建仓权限、远程 Actions、Draft PR 与分支保护以
-  [本地验证记录](../delivery/LOCAL_VERIFICATION.md) 的实测为准；不得把 actionlint 当成远程 CI。
+- 仓库可用、Draft PR #1 和首轮远程 Actions 已核实，见
+  [验证记录](../delivery/LOCAL_VERIFICATION.md)；main 尚未启用分支保护。用户明确授权本轮 Public M0 骨架。
 - 飞书租户应用权限/身份字段、登录/离职事件、相机/扫码、机器人投递均未访问或实测。
 - 监控真实仓库/API/认证、事件 ID/游标、SSO/webhook、时区/断联语义和样本映射均未取得，不作存在性推断。
 - 试点设备盘点/分类/编码、任务执行人、巡检表、工单状态迁移及安全确认必须现场评审。

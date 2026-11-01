@@ -4,13 +4,13 @@
 
 - [x] 独立 GitHub 仓库已创建；用户明确授权本轮按 **Public** 提交 M0 骨架（覆盖原 Private 要求），与冷库规划、监控仓库分离
 - [ ] 设好 `main` 分支保护、PR 审核、禁止直接生产部署
-- [ ] 首个项目初始化 Draft PR；未经单独授权不 Ready / Merge
+- [x] [项目初始化 Draft PR #1](https://github.com/xuezhiorange-png/factory-operations-platform/pull/1)；未经单独授权不 Ready / Merge
 - [x] 初始目录、README、AGENTS、架构和 ADR 模板
 - [x] 基础后端健康检查与三角色纯策略测试
 - [x] 基础前端状态页面（**不含真实业务**）
 - [x] GitHub Actions CI 模板（无部署步骤）
 - [x] 联网安装 Vue 依赖，生成 `frontend/package-lock.json`，CI 改为 `npm ci`，本地干净安装/构建通过
-- [ ] CI 的后端单元测试、Ruff、前端构建、文档检查全部绿灯
+- [x] 首轮远程 push/PR CI 的后端单元测试、Ruff、前端构建、文档检查全部绿灯；后续以最新提交 Checks 为准
 - [ ] 试点厂组织架构、班次、真实业务执行人和权限确认
 - [ ] 设备分类、编码规则、台账样本、现场贴码可行性验收
 - [ ] 巡检表、现有维修单、故障分级、验收责任的现场核对

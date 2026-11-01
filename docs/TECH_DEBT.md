@@ -3,7 +3,7 @@
 | ID | 内容 | 计划 | 风险 |
 |---|---|---|---|
 | TD-001 | M0 无实际认证、数据库或业务数据模型实现 | M1 | 禁止将 M0 暴露给生产 |
-| TD-002 | 已解决：生成 npm lockfile，并以 Node 22 执行 npm ci/typecheck/build；远程 CI 另行验证 | M0 | 不以本地构建代替远程 Actions |
+| TD-002 | 已解决：生成 npm lockfile，并以 Node 22 执行 npm ci/typecheck/build；首轮远程 CI 通过 | M0 | 维护锁文件并核对最新提交的远程 Checks |
 | TD-003 | `can_access_factory` 为纯领域策略示例，并未接入 API | M1 | 若误以为实际授权会产生越权风险 |
 | TD-004 | 尚未取得监控系统真实接口与飞书应用元信息 | M0 审计 | 不能实现已验证 SSO/事件联动 |
 | TD-005 | 无数据库迁移、对象存储、日志、备份与回滚实现 | M1-M6 | 不能用于业务上线 |
