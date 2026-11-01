@@ -25,3 +25,7 @@ uploads/
 .DS_Store
 .idea/
 .vscode/
+
+# Browser verification outputs
+frontend/test-results/
+frontend/playwright-report/

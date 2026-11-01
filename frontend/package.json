@@ -9,14 +9,20 @@
   },
   "scripts": {
     "dev": "vite",
-    "typecheck": "vue-tsc --noEmit",
+    "typecheck": "vue-tsc --noEmit && tsc --noEmit -p tsconfig.e2e.json",
     "build": "npm run typecheck && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "vue": "^3.5.0"
+    "@lucide/vue": "^1.66.0",
+    "vue": "^3.5.0",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^22.20.5",
     "@vitejs/plugin-vue": "^6.0.0",
     "typescript": "~5.9.0",
     "vite": "^7.0.0",

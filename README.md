@@ -1,6 +1,6 @@
 # 加工厂设备运维管理平台 / Factory Operations Platform
 
-> **M0 初始化骨架（2026-11-01）**。仅包含基本 API、Vue 入口、设计基线和 CI。**尚未实现设备台账、飞书登录、巡检、报修或监控联动；不得用于生产。**
+> **M0.5 平台界面空壳（2026-11-01）**。在 M0 基础上实现 PC 管理端与移动 H5 页面框架、导航、交互展示和 CI。**尚未实现实际设备台账、登录授权、巡检、报修或监控联动；不得用于生产。**
 
 ## 目标
 
@@ -9,8 +9,8 @@
 ## 技术
 
 - 后端：Python 3.12+ / FastAPI，计划使用 SQLAlchemy 2、Alembic、PostgreSQL
-- 前端：Node 22.12+（推荐 22 LTS）/ Vue 3 / TypeScript / Vite；M0 仅有状态页
-- CI：GitHub Actions（后端测试、静态检查、前端构建、文档基线检查）
+- 前端：Node 22.12+（推荐 22 LTS）/ Vue 3 / TypeScript / Vite；M0.5 包含模块化管理端与 H5 空壳
+- CI：GitHub Actions（后端测试、静态检查、前端构建/浏览器回归、文档基线检查）
 - 业务模块分层：API → Application → Domain，外部系统隔离在 Infrastructure/Adapters
 - 生产部署、飞书凭据、监控系统访问权限都不包含在此工程包里
 
@@ -40,14 +40,16 @@ CI 使用同一锁文件与 `frontend/.nvmrc`；远程 Actions 与 Draft PR 的�
 python -m pytest -q backend/tests
 python scripts/check_docs.py
 ruff check backend scripts
-cd frontend && npm run typecheck && npm run build
+cd frontend && npm run build
+npx playwright install --with-deps chromium
+npm run test:e2e
 ```
 
 ## 目录
 
 ```
 backend/          FastAPI 最小入口与三角色授权策略示例
-frontend/         Vue 3 最小页面，暂无业务模块
+frontend/         Vue 3 路由、公共组件、PC/H5 布局与独立业务模块空壳
 .github/workflows 基础自动化测试，**不会自动部署**
 docs/product/     V1.3 产品需求基线
 docs/architecture/架构边界、权限、ERD 草案、集成设计和 ADR
@@ -69,5 +71,8 @@ scripts/          只读一致性检查
 
 请先读 [AGENTS.md](AGENTS.md)、[V1.3 PRD](docs/product/PRD_V1.3.md) 和 [M0 验收清单](docs/delivery/M0_CHECKLIST.md)。
 
-本轮发现及设计限制见 [架构审阅](docs/architecture/M0_REVIEW.md)。
+M0 基线审阅见 [架构审阅](docs/architecture/M0_REVIEW.md)。
+M0.5 的 [接入说明与完整路由](docs/architecture/FRONTEND_SHELL.md)、
+[验证记录](docs/delivery/M0_5_VERIFICATION.md) 和 [主要截图](docs/delivery/screenshots/m0-5/README.md) 已提供。
+管理端入口 `/#/workbench`，H5 入口 `/#/m/home`；前端可独立浏览，无需启动后端或数据库。
 M0 的授权策略没有接入业务 API，不构成已上线的认证/权限系统；当前不需要启动数据库。
