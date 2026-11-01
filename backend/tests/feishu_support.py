@@ -9,8 +9,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from factory_ops.api.app import create_app
+from factory_ops.application.access import AccessService
 from factory_ops.application.assets import AssetQueries
 from factory_ops.application.auth import AuthService, AuthSettings
+from factory_ops.infrastructure.database.access import SqlAccessUnitOfWork
 from factory_ops.infrastructure.database.auth import SqlAuthUnitOfWork
 from factory_ops.infrastructure.database.models import ExternalIdentityRow, UserRow
 from factory_ops.infrastructure.identity.feishu import (
@@ -23,10 +25,15 @@ from factory_ops.infrastructure.identity.feishu import (
 ORIGIN = "https://platform.test"
 
 
+class SyntheticCodePool(dict):
+    def __repr__(self):
+        return "<synthetic authorization codes redacted>"
+
+
 def auth_fixture(db, data, origin=ORIGIN):
     settings = AuthSettings(origin, "SYNTH-APP")
     secret = secrets.token_urlsafe(32)
-    codes = {}
+    codes = SyntheticCodePool()
     identities = {role: "SYNTH-SUBJECT-" + role for role in data.users}
     with Session(db.engine) as session:
         for role, uid in data.users.items():
@@ -90,6 +97,7 @@ def auth_fixture(db, data, origin=ORIGIN):
     app = create_app(
         lambda: AssetQueries(lambda: SqlAuthUnitOfWork(db.engine)),
         auth_service=service,
+        access_service=AccessService(lambda: SqlAccessUnitOfWork(db.engine)),
         data_source="synthetic_test",
     )
     return app, service, codes, identities

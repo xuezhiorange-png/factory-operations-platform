@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import pytest
 from sqlalchemy import delete, func, select, text, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from factory_ops.infrastructure.database.models import (
@@ -134,7 +135,16 @@ def test_old_session_does_not_keep_stale_permissions(business, change):
         session.commit()
     expected = (
         401
-        if change in {"disable_user", "revoke_session", "expire_session", "future_session"}
+        if change
+        in {
+            "disable_user",
+            "revoke_session",
+            "expire_session",
+            "future_session",
+            "revoke_grant",
+            "remove_role",
+            "change_group_to_engineer",
+        }
         else 403
     )
     assert http.get(path(data, factory), headers=auth(data, role)).status_code == expected
@@ -178,8 +188,9 @@ def test_multi_factory_admin_misconfiguration_fails_closed(business):
     http, data, db = business
     with Session(db.engine) as session:
         session.add(FactoryAccessRow(user_id=data.users["admin"], factory_id=data.factories["B"]))
-        session.commit()
-    assert http.get(path(data), headers=auth(data, "admin")).status_code == 403
+        with pytest.raises(IntegrityError):
+            session.commit()
+    assert http.get(path(data), headers=auth(data, "admin")).status_code == 200
 
 
 def test_absent_and_empty_resources_do_not_leak(business):

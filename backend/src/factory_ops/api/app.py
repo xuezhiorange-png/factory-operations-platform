@@ -8,9 +8,11 @@ from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from factory_ops.api.access import router as access_router
 from factory_ops.api.assets import router as assets_router
 from factory_ops.api.auth import router as auth_router
 from factory_ops.api.health import router as health_router
+from factory_ops.application.access import AccessService
 from factory_ops.application.assets import AssetQueries
 from factory_ops.application.auth import AuthService
 from factory_ops.application.errors import ApplicationError
@@ -21,6 +23,7 @@ def create_app(
     *,
     data_source: Literal["configured_database", "synthetic_test"] = "configured_database",
     auth_service: AuthService | None = None,
+    access_service: AccessService | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="Factory Operations Platform",
@@ -30,10 +33,11 @@ def create_app(
     app.state.asset_queries = asset_queries
     app.state.data_source = data_source
     app.state.auth_service = auth_service
+    app.state.access_service = access_service
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request: Request, error: RequestValidationError):
-        if request.url.path.startswith("/api/v1/auth"):
+        if request.url.path.startswith(("/api/v1/auth", "/api/v1/access")):
             return JSONResponse(
                 status_code=422,
                 content={"error": {"code": "invalid_request", "message": "请求参数无效"}},
@@ -66,6 +70,7 @@ def create_app(
     app.include_router(health_router, prefix="/api/v1")
     app.include_router(assets_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(access_router, prefix="/api/v1")
     return app
 
 

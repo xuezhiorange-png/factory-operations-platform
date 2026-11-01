@@ -2383,3 +2383,41 @@ td {
 .account-button.identified-account { width: auto; height: 40px; display: flex; gap: 9px; padding: 5px 10px; border-radius: 8px; background: transparent; }
 .identified-account .account-summary { white-space: nowrap; }
 @media(max-width: 760px) { .account-button.identified-account { width: 32px; padding: 0; } }
+
+.people-table td { padding-block: 18px; vertical-align: middle; line-height: 1.65; }
+.people-table td:first-child { min-width: 160px; }
+.people-row-actions { display: flex; gap: 15px; white-space: nowrap; }
+.people-form { display: grid; gap: 22px; margin-top: 22px; }
+.people-scopes { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: grid; gap: 12px; }
+.people-scopes legend { padding-inline: 5px; font-size: 13px; font-weight: 600; }
+.people-checkbox { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.people-checkbox input { width: 17px; height: 17px; accent-color: var(--green); }
+.people-lifecycle { border-top: 1px solid var(--border); padding-top: 22px; display: flex; gap: 12px; flex-wrap: wrap; }
+.people-lifecycle h3, .people-lifecycle p { flex-basis: 100%; }
+.people-lifecycle p { line-height: 1.7; color: var(--muted); font-size: 12px; }
+.people-confirmed { color: var(--green); padding: 12px 0; }
+.people-history { list-style: none; padding: 0; display: grid; gap: 22px; margin-top: 24px; }
+.people-history li { border-left: 2px solid var(--border); padding-left: 18px; display: grid; gap: 8px; }
+.people-history time, .people-history p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+.asset-source-notice { padding: 11px 13px; background: #fbf4e6; color: #765d2e; border: 1px solid #ead9b5; border-radius: 7px; font-size: 11px; line-height: 1.7; }
+.people-module { padding: 24px; }
+.people-module .settings-section-header { padding: 0 0 18px; }
+.people-module .list-footer { padding-inline: 0; }
+.people-table td { padding-inline: 14px; overflow-wrap: anywhere; }
+@media(max-width: 760px) {
+  .people-module { padding: 20px 16px; }
+  .people-table, .people-table tbody { display: block; }
+  .people-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .people-table tbody { display: grid; gap: 14px; padding-block: 16px; }
+  .people-table tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px; }
+  .people-table td { display: block; min-width: 0 !important; padding: 9px; text-align: left; font-size: 12px; }
+  .people-table td::before { content: attr(data-label); display: block; color: var(--muted); font-size: 10px; margin-bottom: 4px; }
+  .people-table td:first-child, .people-table td:last-child { grid-column: 1 / -1; }
+  .people-module .list-footer { flex-wrap: wrap; }
+}
+@media(max-width: 760px) { .people-table { min-width: 0; width: 100%; table-layout: auto; } }
+.people-table { table-layout: auto; }
+.people-table th:last-child { width: 150px; }
+.people-row-actions { justify-content: flex-end; }
+@media(max-width: 760px) { .people-row-actions { justify-content: flex-start; } }

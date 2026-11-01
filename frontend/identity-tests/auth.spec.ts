@@ -118,5 +118,7 @@ test('H5 异常授权保留原目标，重新发起可恢复', async ({ page }) 
   expect(new URL(page.url()).hash.startsWith('#/m/login')).toBe(true);
   await page.unroute(pattern, failedTransport);
   await page.getByRole('button', { name: '通过飞书登录' }).click();
-  await expect(page.getByRole('heading', { name: '现场工作，有序连接', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: '现场工作，有序连接', exact: true }),
+  ).toBeVisible();
 });

@@ -24,6 +24,7 @@ def main():
         data = seed_synthetic(db.engine)
         app, _, codes, subjects = auth_fixture(db, data, "https://localhost:4175")
         subjects["pending"] = "SYNTH-FIRST-LOGIN"
+        subjects["lifecycle"] = "SYNTH-ONLY-LIFECYCLE"
         pool = {}
         for role, subject in subjects.items():
             pool[role] = []

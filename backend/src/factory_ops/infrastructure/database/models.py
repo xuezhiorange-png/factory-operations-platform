@@ -13,6 +13,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -39,6 +40,7 @@ class UserRow(Base):
             "role IS NULL OR role IN ('group_lead', 'engineer', 'factory_equipment_admin')",
             name="ck_users_management_role",
         ),
+        CheckConstraint("auth_version >= 1 AND version >= 1", name="ck_user_versions"),
     )
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     # No name/phone/email is needed by the minimum read capability.
@@ -80,7 +82,10 @@ class ExternalIdentityRow(Base):
 
 class SessionRow(Base):
     __tablename__ = "auth_sessions"
-    __table_args__ = (CheckConstraint("expires_at > issued_at", name="ck_session_expiry"),)
+    __table_args__ = (
+        CheckConstraint("expires_at > issued_at", name="ck_session_expiry"),
+        CheckConstraint("auth_version >= 1", name="ck_session_auth_version"),
+    )
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"))
     token_hash: Mapped[str] = mapped_column(String(64), unique=True)
@@ -152,3 +157,4 @@ class AuditRow(Base):
     outcome: Mapped[str] = mapped_column(String(16))
     channel: Mapped[str] = mapped_column(String(32))
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    details: Mapped[dict | None] = mapped_column(JSONB)

@@ -145,5 +145,12 @@ def seed_synthetic(engine: Engine) -> SyntheticData:
                 subject_id="SYNTH-SUBJECT",
             )
         )
+        session.flush()
+        # Test sessions are issued only after initial grants have settled.
+        for row in session.query(SessionRow).all():
+            user = session.get(UserRow, row.user_id)
+            session.refresh(user)
+            row.auth_version = user.auth_version
+            row.revoked_at = None
         session.commit()
     return data
