@@ -355,3 +355,47 @@ test('页面资源等待期间显示真实加载状态，完成后消失', async
   await expect(page.getByRole('heading', { name: '设备台账', level: 1 })).toBeVisible();
   await expect(page.getByRole('status', { name: '正在打开页面' })).toHaveCount(0);
 });
+
+test('返回已打开的工作台会清除错误并恢复页面标题', async ({ page }) => {
+  await page.route('**/assets/AssetsPage-*.js', (route) => route.abort('failed'));
+  await page.goto('/#/workbench');
+  await page
+    .getByRole('navigation', { name: '主导航', exact: true })
+    .getByRole('link', { name: '设备台账', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: '页面暂时无法打开', level: 1 })).toBeVisible();
+  await page.getByRole('button', { name: '返回工作台' }).click();
+  await expect(page.getByRole('heading', { name: '工作台', level: 1, exact: true })).toBeVisible();
+  await expect(page).toHaveTitle('工作台 · 加工厂设备运维');
+});
+
+test('过期导航的资源失败不会覆盖后来已打开的页面', async ({ page }) => {
+  let release!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/assets/AssetsPage-*.js', async (route) => {
+    await pending;
+    await route.abort('failed');
+  });
+  await page.goto('/#/workbench');
+  const nav = page.getByRole('navigation', { name: '主导航', exact: true });
+  await nav.getByRole('link', { name: '设备台账', exact: true }).click();
+  await expect(page.getByRole('status', { name: '正在打开页面' })).toBeVisible();
+  await nav.getByRole('link', { name: '巡检管理', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '巡检管理', level: 1 })).toBeVisible();
+  const failed = page.waitForEvent('requestfailed', (request) =>
+    /AssetsPage-.*\.js/.test(request.url()),
+  );
+  release();
+  await failed;
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+  await expect(page.getByRole('heading', { name: '巡检管理', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '页面暂时无法打开', level: 1 })).toHaveCount(0);
+  await expect(page).toHaveTitle('巡检管理 · 加工厂设备运维');
+});

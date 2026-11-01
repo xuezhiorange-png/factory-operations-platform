@@ -1,5 +1,10 @@
 import { ref } from 'vue';
-import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router';
+import {
+  createRouter,
+  createWebHashHistory,
+  type RouteLocationNormalized,
+  type RouteRecordRaw,
+} from 'vue-router';
 import DesktopLayout from '../shared/layouts/DesktopLayout.vue';
 import MobileLayout from '../shared/layouts/MobileLayout.vue';
 
@@ -191,6 +196,7 @@ export const router = createRouter({
 });
 export const navigating = ref(false);
 export const failedRoute = ref<string | null>(null);
+let pendingRoute: RouteLocationNormalized | null = null;
 
 export function reloadFailedPage() {
   const target = failedRoute.value;
@@ -207,18 +213,31 @@ export function returnToWorkspace() {
   // Clear even when the workspace is already the current route (a duplicate navigation).
   failedRoute.value = null;
   // onError owns the visible failure state if this navigation also fails.
-  void router.push(destination).catch(() => undefined);
+  void router
+    .push(destination)
+    .then(() => {
+      if (!failedRoute.value)
+        document.title = `${router.currentRoute.value.meta.title} · 加工厂设备运维`;
+    })
+    .catch(() => undefined);
 }
 
-router.beforeEach(() => {
+router.beforeEach((to) => {
+  pendingRoute = to;
   failedRoute.value = null;
   navigating.value = true;
 });
 router.afterEach((to, _from, failure) => {
   if (!failure) document.title = `${to.meta.title} · 加工厂设备运维`;
-  navigating.value = false;
+  if (pendingRoute === to) {
+    pendingRoute = null;
+    navigating.value = false;
+  }
 });
 router.onError((_error, to) => {
+  // Ignore a superseded import: another navigation may already have succeeded.
+  if (pendingRoute !== to) return;
+  pendingRoute = null;
   failedRoute.value = to.fullPath;
   navigating.value = false;
   document.title = '页面加载失败 · 加工厂设备运维';
