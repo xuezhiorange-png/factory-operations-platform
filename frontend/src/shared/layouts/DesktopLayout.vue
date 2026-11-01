@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { navigation, navigationGroups } from '../../app/navigation';
+import { navigation } from '../../app/navigation';
 import AppIcon from '../components/AppIcon.vue';
 import AppOverlay from '../components/AppOverlay.vue';
 import EmptyState from '../components/EmptyState.vue';
+import SidebarNavigation from '../components/SidebarNavigation.vue';
 const route = useRoute();
 const sidebarOpen = ref(false);
+const narrowScreen = window.matchMedia('(max-width: 760px)');
+const isNarrow = ref(narrowScreen.matches);
+function updateViewport(event: MediaQueryListEvent) {
+  sidebarOpen.value = false;
+  isNarrow.value = event.matches;
+}
+onMounted(() => narrowScreen.addEventListener('change', updateViewport));
+onUnmounted(() => narrowScreen.removeEventListener('change', updateViewport));
 const searchOpen = ref(false);
 const factoryOpen = ref(false);
 const accountOpen = ref(false);
@@ -26,40 +35,19 @@ function focusMain() {
 <template>
   <div class="desktop-shell">
     <a href="#main-content" class="skip-link" @click.prevent="focusMain">跳到主要内容</a>
-    <button
-      v-if="sidebarOpen"
-      class="sidebar-backdrop"
-      aria-label="关闭导航菜单"
-      @click="sidebarOpen = false"
-    ></button>
-    <aside id="main-sidebar" class="sidebar" :class="{ expanded: sidebarOpen }">
-      <RouterLink to="/workbench" class="brand"
-        ><span class="brand-icon"><AppIcon name="Boxes" :size="25" /></span
-        ><span><strong>工厂设备运维</strong><small>FACTORY OPERATIONS</small></span></RouterLink
-      >
-      <nav aria-label="主导航" class="sidebar-nav">
-        <div v-for="group in navigationGroups" :key="group" class="nav-group">
-          <p>{{ group }}</p>
-          <RouterLink
-            v-for="item in navigation.filter((item) => item.group === group)"
-            :key="item.id"
-            :to="`/${item.id}`"
-            :class="{ active: route.meta.moduleId === item.id }"
-            ><AppIcon :name="item.icon" :size="19" /><span>{{ item.title }}</span
-            ><span v-if="route.meta.moduleId === item.id" class="nav-active-dot"></span
-          ></RouterLink>
-        </div>
-      </nav>
-      <div class="sidebar-footer">
-        <RouterLink to="/m/home"
-          ><AppIcon name="Smartphone" :size="18" /><span>移动工作台</span
-          ><AppIcon name="ArrowUpRight" :size="15"
-        /></RouterLink>
-        <div class="sidebar-stage">
-          <span class="status-dot"></span>M0.5 <span>平台框架预览</span>
-        </div>
-      </div>
+
+    <aside v-if="!isNarrow" id="main-sidebar" class="sidebar">
+      <SidebarNavigation />
     </aside>
+    <AppOverlay
+      v-if="isNarrow"
+      id="main-sidebar"
+      v-model:open="sidebarOpen"
+      title="导航菜单"
+      kind="drawer"
+      class="navigation-drawer"
+      ><SidebarNavigation
+    /></AppOverlay>
     <div class="desktop-workspace">
       <header class="topbar">
         <button

@@ -267,3 +267,91 @@ test('页面搜索只导航模块，不查询业务记录', async ({ page }) => 
   await expect(page.getByRole('heading', { name: '设备保养', level: 1 })).toBeVisible();
   await expect(dialog).not.toBeVisible();
 });
+
+test('窄屏菜单限制焦点并支持 Escape 恢复触发按钮', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/workbench');
+  const trigger = page.getByRole('button', { name: '打开导航菜单' });
+  await trigger.click();
+  expect(await page.evaluate(() => Boolean(document.activeElement?.closest('#main-sidebar')))).toBe(
+    true,
+  );
+  for (let i = 0; i < 15; i++) {
+    await page.keyboard.press('Tab');
+    expect(
+      await page.evaluate(() => Boolean(document.activeElement?.closest('#main-sidebar'))),
+    ).toBe(true);
+  }
+  await page.keyboard.press('Shift+Tab');
+  expect(await page.evaluate(() => Boolean(document.activeElement?.closest('#main-sidebar')))).toBe(
+    true,
+  );
+  await page.keyboard.press('Escape');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  await expect(trigger).toBeFocused();
+});
+
+test('菜单打开后切到宽屏不会遗留遮罩或锁定背景', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/workbench');
+  await page.getByRole('button', { name: '打开导航菜单' }).click();
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await expect(page.locator('dialog[open]')).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: '主导航', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '未选择工厂' }).click();
+  await expect(page.getByRole('dialog', { name: '选择工厂' })).toBeVisible();
+});
+
+test('页面资源加载失败可显示明确提示并重新加载原目标', async ({ page }) => {
+  let fail = true;
+  await page.route('**/assets/AssetsPage-*.js', (route) => {
+    if (fail) {
+      fail = false;
+      return route.abort('failed');
+    }
+    return route.continue();
+  });
+  await page.goto('/#/workbench');
+  await page
+    .getByRole('navigation', { name: '主导航', exact: true })
+    .getByRole('link', { name: '设备台账', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: '页面暂时无法打开', level: 1 })).toBeVisible();
+  await expect(page.getByRole('status', { name: '正在打开页面' })).toHaveCount(0);
+  await page.getByRole('button', { name: '重新加载页面' }).click();
+  await expect(page.getByRole('heading', { name: '设备台账', level: 1 })).toBeVisible();
+  await expect(page).toHaveURL(/#\/assets$/);
+});
+
+test('H5 首次加载失败时仍能返回移动工作台', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route('**/assets/AssetsPage-*.js', (route) => route.abort('failed'));
+  await page.goto('/#/m/assets');
+  await expect(page.getByRole('heading', { name: '页面暂时无法打开', level: 1 })).toBeVisible();
+  await page.getByRole('button', { name: '返回工作台' }).click();
+  await expect(page.getByRole('heading', { name: '现场工作，有序连接', level: 1 })).toBeVisible();
+  await expect(page).toHaveURL(/#\/m\/home$/);
+});
+
+test('页面资源等待期间显示真实加载状态，完成后消失', async ({ page }) => {
+  let release!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/assets/AssetsPage-*.js', async (route) => {
+    await pending;
+    await route.continue();
+  });
+  await page.goto('/#/workbench');
+  await page
+    .getByRole('navigation', { name: '主导航', exact: true })
+    .getByRole('link', { name: '设备台账', exact: true })
+    .click();
+  try {
+    await expect(page.getByRole('status', { name: '正在打开页面' })).toBeVisible();
+  } finally {
+    release();
+  }
+  await expect(page.getByRole('heading', { name: '设备台账', level: 1 })).toBeVisible();
+  await expect(page.getByRole('status', { name: '正在打开页面' })).toHaveCount(0);
+});

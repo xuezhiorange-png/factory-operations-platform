@@ -2,7 +2,11 @@
 
 日期：2026-11-01  
 TASK_ID：`FACTORY_OPS_M0_5_PLATFORM_SHELL`  
-分支：`codex/m0-5-platform-shell`，依赖 M0 的 `codex/m0-bootstrap`（基线 `adc5856d4daf117535eaafbf03c8422356c14ceb`）。
+初次交付分支：`codex/m0-5-platform-shell`，开发基线为 `codex/m0-bootstrap`（`adc5856d4daf117535eaafbf03c8422356c14ceb`）。
+
+**当前状态**：M0 PR #1、M0.5 PR #2 已由远程仓库流程合并。最新 main 为 `fa5562c9b9753fdfda6ab090991d07dfdfca2cb3`；
+后续界面修正位于独立分支 `codex/m0-5-shell-resilience`。本页保留初次交付测试证据，新增验证见
+[交互收尾记录](M0_5_RESILIENCE.md)。
 
 ## 实现范围
 
@@ -10,7 +14,7 @@ TASK_ID：`FACTORY_OPS_M0_5_PLATFORM_SHELL`
 - PC 顶部导航/侧栏/面包屑/工作台，H5 首页/任务/扫码/消息/我的与模块入口。
 - 公共颜色、字体、卡片、表格、筛选、表单、页签、弹窗/抽屉、空状态与加载状态。
 - 模块独立目录、拟定读端口、三角色展示和飞书/监控接口边界；未实现任何业务服务。
-- 本轮依赖 M0 的独立 Draft PR，不 Ready、不合并、不部署；保留 M0 后端与健康契约原样。
+- 初次通过依赖 M0 的独立 Draft PR 交付；后端与健康契约保留原样。后续只做界面修正，不自行 Ready、合并或部署。
 
 ## 本地实测
 
@@ -26,7 +30,7 @@ TASK_ID：`FACTORY_OPS_M0_5_PLATFORM_SHELL`
 | 文档基线与本地链接 | PASS | `.venv/bin/python scripts/check_docs.py` |
 | 主要页面截图 | PASS | 12 张实际 Chromium 截图，PC 1440×1060（全页），H5 390×844（视口） |
 | GitHub 远程 CI | PASS（首轮导入 SHA） | 已读取真实 push 三作业及前端日志，64 项浏览器检查通过；SHA 与运行链接见下 |
-| Draft PR | PASS | [PR #2](https://github.com/xuezhiorange-png/factory-operations-platform/pull/2)，OPEN / Draft，base=codex/m0-bootstrap |
+| 初次 PR | 已合并 | [PR #2](https://github.com/xuezhiorange-png/factory-operations-platform/pull/2)，创建时为 Draft/base=codex/m0-bootstrap，后经远程维护改为 main 并合并 |
 
 复现（在 frontend，安装 Node 22.12+ 与 npm 10 后）：
 
@@ -48,8 +52,8 @@ CAPTURE_SHELL_SCREENSHOTS=1 npm run test:e2e -- --grep '交付截图'
 ## 远程交付证据
 
 [Draft PR #2](https://github.com/xuezhiorange-png/factory-operations-platform/pull/2) 已创建，
-base 为 `codex/m0-bootstrap`，head 为 `codex/m0-5-platform-shell`；85 个增量文件、12 张截图，后端文件无变化。
-M0 PR #1 仍为 Draft，不在本轮改动或合并。
+创建时 base 为 `codex/m0-bootstrap`，head 为 `codex/m0-5-platform-shell`；初次交付 85 个增量文件、12 张截图，后端文件无变化。
+M0 PR #1 随后合并，PR #2 改为 main 并合并；本轮后续没有执行这些合并。
 
 首轮导入提交：`c0347ca421e430a428b637cf48c4c1ee3fcfa5d8`。
 [实际 push 运行 41298234721](https://github.com/xuezhiorange-png/factory-operations-platform/actions/runs/41298234721)

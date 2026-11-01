@@ -18,5 +18,12 @@ PC 1440×1060（全页可高于 1060），H5 390×844（视口截图，页面可
 | H5 我的 | `/#/m/me` | [查看](mobile-me.png) |
 | H5 设备详情 | `/#/m/assets/preview` | [查看](mobile-asset-detail.png) |
 
+新增交互状态截图：
+
+| 状态 | 说明 | 截图 |
+|---|---|---|
+| 窄屏管理端菜单 | 390×844，原生模态抽屉与键盘焦点循环 | [查看](narrow-navigation.png) |
+| 页面资源加载失败 | 1440×1060，通过本地静态脚本请求失败注入采集，非业务错误或真实系统连接 | [查看](route-load-failure.png) |
+
 复现命令见 [验证记录](../../M0_5_VERIFICATION.md)。源码中的 `screenshots.spec.ts` 控制采集路线，
 普通 CI 将截图保存在测试 artifact；只有显式 `CAPTURE_SHELL_SCREENSHOTS=1` 才更新本目录图片。

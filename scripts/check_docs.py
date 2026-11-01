@@ -36,6 +36,9 @@ REQUIRED = [
     "docs/architecture/ADR-0003-platform-shell.md",
     "docs/architecture/FRONTEND_SHELL.md",
     "docs/delivery/M0_5_VERIFICATION.md",
+    "docs/delivery/M0_5_RESILIENCE.md",
+    "frontend/src/app/RouteLoadFailure.vue",
+    "frontend/src/shared/components/SidebarNavigation.vue",
     "docs/delivery/screenshots/m0-5/README.md",
     "frontend/src/app/router.ts",
     "frontend/src/shared/layouts/DesktopLayout.vue",
@@ -50,7 +53,7 @@ REQUIRED.extend(
     for name in (
         "pc-workbench", "pc-assets", "pc-asset-detail", "pc-work-order", "pc-roles",
         "pc-integrations", "mobile-home", "mobile-tasks", "mobile-scan", "mobile-messages",
-        "mobile-me", "mobile-asset-detail",
+        "mobile-me", "mobile-asset-detail", "narrow-navigation", "route-load-failure",
     )
 )
 missing = [path for path in REQUIRED if not (ROOT / path).is_file()]

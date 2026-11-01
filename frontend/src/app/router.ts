@@ -190,13 +190,36 @@ export const router = createRouter({
   ],
 });
 export const navigating = ref(false);
+export const failedRoute = ref<string | null>(null);
+
+export function reloadFailedPage() {
+  const target = failedRoute.value;
+  if (!target) return;
+  // An explicit reload also clears the browser's cached failed module import.
+  // router.resolve produces an internal hash URL, never an external destination.
+  window.history.replaceState(window.history.state, '', router.resolve(target).href);
+  window.location.reload();
+}
+
+export function returnToWorkspace() {
+  const target = failedRoute.value ?? '';
+  const destination = target.startsWith('/m/') || target === '/m' ? '/m/home' : '/workbench';
+  // Clear even when the workspace is already the current route (a duplicate navigation).
+  failedRoute.value = null;
+  // onError owns the visible failure state if this navigation also fails.
+  void router.push(destination).catch(() => undefined);
+}
+
 router.beforeEach(() => {
+  failedRoute.value = null;
   navigating.value = true;
 });
-router.afterEach((to) => {
-  document.title = `${to.meta.title} · 加工厂设备运维`;
+router.afterEach((to, _from, failure) => {
+  if (!failure) document.title = `${to.meta.title} · 加工厂设备运维`;
   navigating.value = false;
 });
-router.onError(() => {
+router.onError((_error, to) => {
+  failedRoute.value = to.fullPath;
   navigating.value = false;
+  document.title = '页面加载失败 · 加工厂设备运维';
 });

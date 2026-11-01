@@ -35,3 +35,32 @@ for (const [name, route, mobile] of screens) {
     });
   });
 }
+
+for (const scenario of ['narrow-navigation', 'route-load-failure'] as const) {
+  test(`交付截图：${scenario}`, async ({ page }, testInfo) => {
+    await page.setViewportSize(
+      scenario === 'narrow-navigation'
+        ? { width: 390, height: 844 }
+        : { width: 1440, height: 1060 },
+    );
+    if (scenario === 'route-load-failure') {
+      await page.route('**/assets/AssetsPage-*.js', (route) => route.abort('failed'));
+      await page.goto('/#/assets');
+      await expect(page.getByRole('heading', { name: '页面暂时无法打开', level: 1 })).toBeVisible();
+    } else {
+      await page.goto('/#/workbench');
+      await page.getByRole('button', { name: '打开导航菜单' }).click();
+      await expect(page.getByRole('dialog', { name: '导航菜单' })).toBeVisible();
+    }
+    await page.evaluate(() => document.fonts.ready);
+    const folder = process.env.CAPTURE_SHELL_SCREENSHOTS
+      ? path.resolve('../docs/delivery/screenshots/m0-5')
+      : testInfo.outputDir;
+    await mkdir(folder, { recursive: true });
+    await page.screenshot({
+      path: path.join(folder, scenario + '.png'),
+      fullPage: false,
+      animations: 'disabled',
+    });
+  });
+}

@@ -11,6 +11,29 @@ const titleId = useId();
 function backdrop(event: MouseEvent) {
   if (event.target === dialog.value) emit('update:open', false);
 }
+function keepFocusInside(event: KeyboardEvent) {
+  if (event.key !== 'Tab' || !dialog.value?.open) return;
+  const controls = [
+    ...dialog.value.querySelectorAll<HTMLElement>(
+      'a[href], button, input, select, textarea, [tabindex]',
+    ),
+  ].filter(
+    (element) =>
+      element.tabIndex >= 0 && !element.matches(':disabled') && element.getClientRects().length > 0,
+  );
+  const first = controls[0];
+  const last = controls.at(-1);
+  if (!first || !last) {
+    event.preventDefault();
+    dialog.value.focus();
+  } else if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
 watch(
   [() => props.open, dialog],
   () => {
@@ -27,6 +50,7 @@ watch(
     :aria-labelledby="titleId"
     @close="emit('update:open', false)"
     @click="backdrop"
+    @keydown="keepFocusInside"
   >
     <div class="overlay-inner">
       <header class="overlay-header">

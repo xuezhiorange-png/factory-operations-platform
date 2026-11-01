@@ -74,5 +74,6 @@ scripts/          只读一致性检查
 M0 基线审阅见 [架构审阅](docs/architecture/M0_REVIEW.md)。
 M0.5 的 [接入说明与完整路由](docs/architecture/FRONTEND_SHELL.md)、
 [验证记录](docs/delivery/M0_5_VERIFICATION.md) 和 [主要截图](docs/delivery/screenshots/m0-5/README.md) 已提供。
+M0/M0.5 已合并后的导航与加载失败恢复补强见 [交互收尾记录](docs/delivery/M0_5_RESILIENCE.md)。
 管理端入口 `/#/workbench`，H5 入口 `/#/m/home`；前端可独立浏览，无需启动后端或数据库。
 M0 的授权策略没有接入业务 API，不构成已上线的认证/权限系统；当前不需要启动数据库。
