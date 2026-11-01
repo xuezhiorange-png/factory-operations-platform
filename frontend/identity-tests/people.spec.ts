@@ -135,7 +135,25 @@ test('工程师人员入口拒绝访问，失败写入没有成功提示', async
     page.getByRole('heading', { name: '仅集团负责人可管理人员', exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: /^当前账号：/ }).click();
+  let finishLogout!: () => void;
+  const waitingForServer = new Promise<void>((resolve) => {
+    finishLogout = resolve;
+  });
+  await page.route('**/api/v1/auth/logout', async (route) => {
+    await waitingForServer;
+    await route.continue();
+  });
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  try {
+    await expect(page.getByRole('button', { name: '正在退出…', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '登录设备运维平台', exact: true })).toHaveCount(
+      0,
+    );
+  } finally {
+    finishLogout();
+  }
+  await expect(page.getByRole('heading', { name: '登录设备运维平台', exact: true })).toBeVisible();
+  await page.unroute('**/api/v1/auth/logout');
   await enter(page, 'group', '/settings?tab=people');
   await (await row(page, data.users.multi!)).getByRole('button', { name: '管理授权' }).click();
   await page.getByRole('checkbox', { name: '合成测试工厂 B', exact: true }).uncheck();

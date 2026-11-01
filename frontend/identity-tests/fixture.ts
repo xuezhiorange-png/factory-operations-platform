@@ -79,6 +79,21 @@ export async function enter(page: Page, role = 'engineer', target = '/assets') {
     )
     .toBe(true);
   await expect(page.locator('#main-content')).toBeVisible();
+  const fixture = JSON.parse(
+    await readFile(process.env.FACTORY_OPS_IDENTITY_FIXTURE!, 'utf8'),
+  ) as SyntheticFixture;
+  const expectedUser = fixture.users[role];
+  if (expectedUser) {
+    // Confirm the newly authenticated server account, even when the hash target is unchanged.
+    await expect
+      .poll(async () => {
+        const response = await page.request.get('/api/v1/auth/me');
+        if (!response.ok()) return false;
+        const current = await response.json();
+        return current.id === expectedUser;
+      })
+      .toBe(true);
+  }
 }
 export async function capture(page: Page, filename: string) {
   if (process.env.FACTORY_OPS_CAPTURE_SCREENSHOTS !== '1') return;
