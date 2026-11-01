@@ -1,0 +1,123 @@
+name: M0.6 Static Shell Pages Preview
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/m0-6-pages-preview.yml'
+      - 'scripts/check_pages_dist.py'
+      - 'docs/delivery/M0_6_PAGES.md'
+      - 'docs/architecture/ADR-0004-static-preview.md'
+  push:
+    branches: ['main']
+    paths:
+      - '.github/workflows/m0-6-pages-preview.yml'
+  workflow_dispatch:
+
+# PR builds have read-only permissions; deployment permissions are scoped to deploy.
+permissions:
+  contents: read
+
+concurrency:
+  group: m0-6-pages-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build frozen empty shell for project Pages path
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout frozen M0.5 empty shell (not current future business code)
+        uses: actions/checkout@v4
+        with:
+          ref: f38232dd3821c22b964d8298edddac6b5be63705
+          path: preview-source
+          persist-credentials: false
+      - name: Checkout verification code and workflow documentation
+        uses: actions/checkout@v4
+        with:
+          path: delivery-config
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: preview-source/frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: preview-source/frontend/package-lock.json
+      - name: Install locked dependencies
+        working-directory: preview-source/frontend
+        run: npm ci --no-audit --no-fund
+      - name: Build with GitHub Pages repository base path
+        working-directory: preview-source/frontend
+        run: npm run build -- --base /factory-operations-platform/
+      - name: Validate static assets and ensure no debug/secret files
+        run: python delivery-config/scripts/check_pages_dist.py preview-source/frontend/dist
+      - name: Bypass Jekyll
+        run: touch preview-source/frontend/dist/.nojekyll
+      - name: Preserve PR preview build for review (not published)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: m0-6-frozen-static-preview
+          path: preview-source/frontend/dist
+          retention-days: 7
+      - name: Upload Pages artifact (main only)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: preview-source/frontend/dist
+
+  check-pages:
+    name: Check whether GitHub Pages is enabled
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      enabled: ${{ steps.inspect.outputs.enabled }}
+    steps:
+      - name: Check repository Pages enablement (read-only)
+        id: inspect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from urllib.request import Request, urlopen
+
+          request = Request(
+              'https://api.github.com/repos/' + os.environ['REPOSITORY'],
+              headers={
+                  'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                  'Accept': 'application/vnd.github+json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+              },
+          )
+          with urlopen(request, timeout=20) as response:
+              enabled = json.load(response).get('has_pages') is True
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write('enabled=' + str(enabled).lower() + '\n')
+          if not enabled:
+              print('::notice::GitHub Pages is not enabled. Set Settings > Pages > Source to GitHub Actions, then run this workflow from main.')
+          PY
+
+  deploy:
+    name: Publish frozen shell only if Pages was enabled
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.check-pages.outputs.enabled == 'true'
+    needs: [build, check-pages]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages (does not auto-enable the repository)
+        uses: actions/configure-pages@v5
+      - name: Deploy verified static artifact
+        id: deployment
+        uses: actions/deploy-pages@v4
