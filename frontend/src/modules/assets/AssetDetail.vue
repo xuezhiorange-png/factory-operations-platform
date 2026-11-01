@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
+import { assetsApiEnabled } from '../../app/features';
+import AssetLiveDetail from './AssetLiveDetail.vue';
 import DetailPage from '../../shared/components/DetailPage.vue';
 import type { DetailConfig } from '../../shared/types';
+const route = useRoute();
 const config = {
   title: '设备详情',
   parent: '设备台账',
@@ -27,4 +31,9 @@ const config = {
   sideDescription: '标签生成与扫码入口将在台账接入后启用。',
 } satisfies DetailConfig;
 </script>
-<template><DetailPage :config="config" /></template>
+<template>
+  <AssetLiveDetail
+    v-if="assetsApiEnabled && route.params.id !== 'preview'"
+    :config="config"
+  /><DetailPage v-else :config="config" />
+</template>

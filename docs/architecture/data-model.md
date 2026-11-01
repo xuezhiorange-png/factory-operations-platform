@@ -1,4 +1,9 @@
-# M0 数据库模型草案（尚未创建数据库迁移）
+# 数据模型：M1-01 实际范围与 M0 全量草案
+
+M1-01 已通过 Alembic 创建 `factories / users / user_factory_access / assets /
+external_identities / auth_sessions / audit_events` 七张表，未预置业务记录。
+实际约束、迁移与局限见 [ADR-0005](ADR-0005-minimal-business-foundation.md)。
+下文是 M0 的全量设计基线；除上述最小范围外仍未实现，不能当作已有数据库结构。
 
 ```mermaid
 erDiagram
@@ -65,5 +70,5 @@ erDiagram
 - 业务状态、追加审计和 outbox 同一事务提交；worker 至少一次投递，收件端/投递表按事件与接收方去重。
   outbox 持久化状态、重试次数、下次重试和最终失败原因，不能仅靠进程内队列。
 
-以上为设计预留，未创建表或验证 PostgreSQL 约束。资产导入/编码设计见
+以上全量扩展仍为设计预留；M1-01 仅验证前述七张表约束。资产导入/编码设计见
 [数据基线](../data/ASSET_BASELINE.md)，接口约束见 [API 目录](../api/README.md)。

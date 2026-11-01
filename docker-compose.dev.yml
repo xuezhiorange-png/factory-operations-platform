@@ -1,4 +1,4 @@
-# LOCAL DEVELOPMENT ONLY: database is not used by M0 API yet.
+# LOCAL DEVELOPMENT ONLY: M1 API uses DATABASE_URL; migrations are explicit, never automatic.
 services:
   db:
     image: postgres:17

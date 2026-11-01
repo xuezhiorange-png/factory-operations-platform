@@ -1,4 +1,12 @@
-# M0 接口契约与后续目录
+# 接口现状与后续目录
+
+## M1-01 已实现：工厂范围内的设备只读查询
+
+已实现 `GET /api/v1/factories`、`GET /api/v1/factories/{factory_id}/assets`、
+`GET /api/v1/factories/{factory_id}/assets/{asset_id}`。均需后端有效会话与逐次工厂授权，
+无正式登录或写 API。请求/响应、错误、审计及只读 MCP 契约见
+[M1-01 完整契约](M1_01_ASSET_READ.md)，当前边界见
+[ADR-0005](../architecture/ADR-0005-minimal-business-foundation.md)。
 
 ## 已实现：进程存活
 
@@ -18,9 +26,8 @@
 | 阶段 | 路径草案 | 权限和事务要点 |
 |---|---|---|
 | M1 | `POST /api/v1/auth/feishu/exchange` | 官方身份校验+本地角色/厂授权；不以姓名/部门授权 |
-| M1 | `GET /api/v1/factories` | 只返回调用者可访问的工厂 |
-| M1 | `GET/POST /api/v1/factories/{factory_id}/assets` | 服务端授权；新增审计+幂等+事务 |
-| M1 | `GET/PATCH /api/v1/factories/{factory_id}/assets/{asset_id}` | 资源真实工厂与路由一致；更新版本号 |
+| M1 | `POST /api/v1/factories/{factory_id}/assets` | 服务端授权；新增审计+幂等+事务 |
+| M1 | `PATCH /api/v1/factories/{factory_id}/assets/{asset_id}` | 资源真实工厂与路由一致；更新版本号 |
 | M1 | `POST /api/v1/factories/{factory_id}/asset-imports` | 先校验、差异预览，再确认；不静默覆盖身份 |
 | M1 | `POST /api/v1/factories/{factory_id}/assets/{asset_id}/installations` | 有效期/机位/同厂约束；保留旧历史 |
 | M1 | `GET /api/v1/factories/{factory_id}/attachments/{attachment_id}` | 同厂/所属资源授权后颁发短期对象链接 |

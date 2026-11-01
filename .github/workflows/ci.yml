@@ -18,6 +18,19 @@ jobs:
     name: Backend / tests and lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: factory_ops_test
+          POSTGRES_USER: factory_ops_test
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U factory_ops_test -d factory_ops_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      FACTORY_OPS_TEST_DATABASE_URL: postgresql+psycopg://factory_ops_test:synthetic-ci-only@127.0.0.1:5432/factory_ops_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,6 +47,19 @@ jobs:
     name: Frontend / typecheck and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: factory_ops_test
+          POSTGRES_USER: factory_ops_test
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U factory_ops_test -d factory_ops_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      FACTORY_OPS_TEST_DATABASE_URL: postgresql+psycopg://factory_ops_test:synthetic-ci-only@127.0.0.1:5432/factory_ops_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,6 +79,21 @@ jobs:
       - name: Check routes, interactions, responsive layout and accessibility
         working-directory: frontend
         run: npm run test:e2e
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated business test server dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -e './backend[dev]'
+      - name: Build enabled read capability separately from the shell
+        working-directory: frontend
+        env:
+          VITE_ASSETS_API_ENABLED: 'true'
+        run: npm run build -- --outDir dist-business
+      - name: Verify real API and PostgreSQL in PC and H5 (no auth artifacts)
+        working-directory: frontend
+        run: npm run test:business
       - name: Preserve browser verification evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -64,7 +105,7 @@ jobs:
           retention-days: 7
 
   docs:
-    name: M0 / documentation baseline
+    name: Platform / documentation baseline
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

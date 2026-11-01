@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { assetsApiEnabled } from '../../app/features';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { managementRoles } from './roles';
@@ -72,7 +73,13 @@ function showHelp(kind: string) {
           <AppIcon name="ShieldCheck" />
           <div>
             <strong>独立验收，不因角色而例外</strong>
-            <p>任何人不得验收本人实际执行的维修工单。当前没有已登录账号、角色分配或权限验证。</p>
+            <p>
+              {{
+                assetsApiEnabled
+                  ? '任何人不得验收本人实际执行的维修工单。当前设备查询由后端验证权限，本页不提供授权修改或身份模拟。'
+                  : '任何人不得验收本人实际执行的维修工单。当前没有已登录账号、角色分配或权限验证。'
+              }}
+            </p>
           </div>
         </div>
         <p class="settings-hint">

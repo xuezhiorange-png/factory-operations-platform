@@ -29,3 +29,7 @@ uploads/
 # Browser verification outputs
 frontend/test-results/
 frontend/playwright-report/
+
+# Private authenticated browser test outputs (never upload)
+frontend/dist-business/
+frontend/.business-test-results/

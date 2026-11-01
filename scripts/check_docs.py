@@ -1,4 +1,4 @@
-"""Read-only M0 document baseline check. No network or secrets required."""
+"""Read-only platform document baseline check. No network or secrets required."""
 
 import re
 from pathlib import Path
@@ -47,6 +47,25 @@ REQUIRED = [
     "frontend/playwright.config.ts",
     "frontend/tests/shell.spec.ts",
     "frontend/tests/screenshots.spec.ts",
+    "backend/alembic.ini",
+    "backend/migrations/versions/0001_m1_foundation_m1_01_minimum_business_foundation.py",
+    "backend/src/factory_ops/application/assets.py",
+    "backend/src/factory_ops/application/mcp.py",
+    "backend/src/factory_ops/infrastructure/identity/providers.py",
+    "backend/tests/test_database.py",
+    "backend/tests/test_asset_api.py",
+    "backend/tests/test_mcp_identity.py",
+    "frontend/src/modules/assets/AssetsLivePage.vue",
+    "frontend/src/modules/assets/AssetLiveDetail.vue",
+    "frontend/src/modules/assets/api.ts",
+    "frontend/playwright.business.config.ts",
+    "frontend/business-tests/assets.spec.ts",
+    "scripts/serve_business_test_api.py",
+    "docs/architecture/ADR-0005-minimal-business-foundation.md",
+    "docs/architecture/IDENTITY_ADAPTERS_M1.md",
+    "docs/api/M1_01_ASSET_READ.md",
+    "docs/delivery/M1_01_VERIFICATION.md",
+    "docs/delivery/M1_NEXT_TASKS.md",
 ]
 REQUIRED.extend(
     f"docs/delivery/screenshots/m0-5/{name}.png"
