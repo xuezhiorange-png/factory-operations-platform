@@ -41,3 +41,24 @@ class IdentityUnavailable(ApplicationError):
     code = "identity_provider_unavailable"
     message = "身份接入渠道尚未配置"
     status = 503
+
+
+class InvalidLogin(Unauthenticated):
+    code = "invalid_login"
+    message = "登录凭证无效、已过期或已使用，请重新发起登录"
+
+
+class SessionExpired(Unauthenticated):
+    code = "session_expired"
+    message = "登录已过期或被撤销，请重新登录"
+
+
+class CsrfRejected(AccessDenied):
+    code = "csrf_rejected"
+    message = "请求来源或安全校验无效，请刷新后重试"
+
+
+class Conflict(ApplicationError):
+    code = "version_conflict"
+    message = "记录已变化或操作条件不满足，请刷新后重试"
+    status = 409

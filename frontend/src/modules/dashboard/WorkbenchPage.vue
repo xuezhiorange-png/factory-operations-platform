@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { identityEnabled } from '../../app/features';
+import { account } from '../identity/account';
 import { navigation } from '../../app/navigation';
 import AppIcon from '../../shared/components/AppIcon.vue';
 import PageHeader from '../../shared/components/PageHeader.vue';
@@ -10,7 +12,7 @@ import AppOverlay from '../../shared/components/AppOverlay.vue';
 const taskTab = ref('全部待办');
 const guideOpen = ref(false);
 const metrics = [
-  { title: '设备资产', icon: 'Boxes' as const, note: '待接入设备台账', accent: 'sage' },
+  { title: '设备资产', icon: 'Boxes' as const, note: identityEnabled ? '台账已接入，汇总待开发' : '待接入设备台账', accent: 'sage' },
   { title: '待执行任务', icon: 'ClipboardCheck' as const, note: '待接入任务服务', accent: 'blue' },
   { title: '待验收工单', icon: 'Wrench' as const, note: '待接入维修工单', accent: 'sand' },
   { title: '设备可用率', icon: 'BarChart3' as const, note: '暂无可计算数据', accent: 'lilac' },
@@ -84,11 +86,11 @@ const metrics = [
         </header>
         <div class="connection-row">
           <span class="connection-icon"><AppIcon name="Building2" :size="18" /></span
-          ><span>组织与工厂</span><span class="connection-state">未接入</span>
+          ><span>组织与工厂</span><span class="connection-state">{{ identityEnabled ? `已授权 ${account.user?.factories.length ?? 0} 厂` : '未接入' }}</span>
         </div>
         <div class="connection-row">
           <span class="connection-icon"><AppIcon name="MessageSquareWarning" :size="18" /></span
-          ><span>飞书企业应用</span><span class="connection-state">未接入</span>
+          ><span>飞书企业应用</span><span class="connection-state">{{ identityEnabled ? (account.configured ? '已配置' : '未配置') : '未接入' }}</span>
         </div>
         <div class="connection-row">
           <span class="connection-icon"><AppIcon name="Monitor" :size="18" /></span

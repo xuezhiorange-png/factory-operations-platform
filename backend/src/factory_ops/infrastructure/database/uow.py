@@ -55,12 +55,21 @@ class SqlReadUnitOfWork:
             statement = (
                 select(SessionRow.user_id)
                 .join(UserRow)
+                .outerjoin(
+                    ExternalIdentityRow, SessionRow.external_identity_id == ExternalIdentityRow.id
+                )
                 .where(
                     SessionRow.token_hash == identity.token_hash,
                     SessionRow.revoked_at.is_(None),
                     SessionRow.issued_at <= datetime.now(UTC),
                     SessionRow.expires_at > datetime.now(UTC),
                     UserRow.active.is_(True),
+                    SessionRow.auth_version == UserRow.auth_version,
+                    or_(
+                        SessionRow.external_identity_id.is_(None),
+                        (ExternalIdentityRow.active.is_(True))
+                        & (ExternalIdentityRow.user_id == SessionRow.user_id),
+                    ),
                 )
             )
         elif isinstance(identity, ExternalIdentity):

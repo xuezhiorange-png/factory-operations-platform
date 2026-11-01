@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { identityEnabled } from '../../app/features';
+import { accountLabel } from '../identity/account';
 import { navigation } from '../../app/navigation';
 import AppIcon from '../../shared/components/AppIcon.vue';
 import EmptyState from '../../shared/components/EmptyState.vue';
@@ -9,7 +11,10 @@ import ShellNotice from '../../shared/components/ShellNotice.vue';
     <span class="eyebrow">MOBILE WORKSPACE</span>
     <h1>现场工作，有序连接</h1>
     <p>设备、任务与消息，随时找到清晰入口。</p>
-    <span class="mobile-preview-label"><span class="status-dot"></span>H5 界面预览 · 未登录</span>
+    <span class="mobile-preview-label"
+      ><span class="status-dot"></span
+      >{{ identityEnabled ? accountLabel : 'H5 界面预览 · 未登录' }}</span
+    >
   </section>
   <ShellNotice />
   <section class="mobile-metrics" aria-label="任务概况">

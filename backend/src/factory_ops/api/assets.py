@@ -16,7 +16,7 @@ from factory_ops.application.identity import IdentityReference, SessionIdentityP
 router = APIRouter(tags=["assets-read"])
 bearer_scheme = HTTPBearer(auto_error=False, scheme_name="OpaqueSessionBearer")
 cookie_scheme = APIKeyCookie(
-    name="factory_ops_session", auto_error=False, scheme_name="PlatformSession"
+    name="__Host-factory_ops_session", auto_error=False, scheme_name="PlatformSession"
 )
 
 
@@ -70,7 +70,11 @@ def identity(
     session_cookie: Annotated[str | None, Depends(cookie_scheme)],
 ) -> IdentityReference:
     header = request.headers.get("authorization")
-    cookie = session_cookie
+    cookie = (
+        session_cookie
+        if request.app.state.auth_service
+        else request.cookies.get("factory_ops_session")
+    )
     bearer = None
     if header:
         scheme, _, bearer = header.partition(" ")

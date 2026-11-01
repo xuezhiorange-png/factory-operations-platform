@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { assetsApiEnabled } from '../../app/features';
+import { assetsApiEnabled, identityEnabled } from '../../app/features';
 import AppIcon from '../../shared/components/AppIcon.vue';
+import IdentityPanel from '../identity/IdentityPanel.vue';
 </script>
 <template>
   <header class="mobile-page-heading">
@@ -8,14 +9,23 @@ import AppIcon from '../../shared/components/AppIcon.vue';
     <h1>我的</h1>
     <p>个人身份、工厂范围与平台入口。</p>
   </header>
-  <section class="panel profile-card">
-    <span class="profile-symbol"><AppIcon name="CircleUserRound" :size="33" /></span>
-    <div>
-      <h2>{{ assetsApiEnabled ? '外部身份通道待接入' : '身份服务尚未接入' }}</h2>
-      <p>{{ assetsApiEnabled ? '本页不提供登录或角色切换' : '未登录 · 未分配角色或工厂' }}</p>
-    </div>
-    <span class="status-pill neutral">预览</span>
+  <section v-if="identityEnabled" class="panel profile-card">
+    <IdentityPanel />
   </section>
+  <template v-else>
+    <section class="panel profile-card">
+      <span class="profile-symbol"><AppIcon name="CircleUserRound" :size="33" /></span>
+      <div>
+        <h2>
+          {{ assetsApiEnabled ? '外部身份通道待接入' : '身份服务尚未接入' }}
+        </h2>
+        <p>
+          {{ assetsApiEnabled ? '本页不提供登录或角色切换' : '未登录 · 未分配角色或工厂' }}
+        </p>
+      </div>
+      <span class="status-pill neutral">预览</span>
+    </section>
+  </template>
   <section class="panel profile-menu">
     <RouterLink to="/m/settings?tab=organization"
       ><AppIcon name="Building2" />
@@ -42,9 +52,11 @@ import AppIcon from '../../shared/components/AppIcon.vue';
     <AppIcon name="Fingerprint" :size="23" />
     <p>
       {{
-        assetsApiEnabled
-          ? '设备只读查询通过后端逐次校验会话与权限。飞书与豆包身份接入仍未实现，本页不会展示虚假登录状态。'
-          : '本轮没有模拟登录、角色切换或虚假权限验证。身份与授权将由后续后端服务提供。'
+        identityEnabled
+          ? '飞书身份与工厂权限分开校验。人员授权由集团负责人管理，身份验证不会自动授予管理权限。'
+          : assetsApiEnabled
+            ? '设备只读查询通过后端逐次校验会话与权限。飞书与豆包身份接入仍未实现，本页不会展示虚假登录状态。'
+            : '本轮没有模拟登录、角色切换或虚假权限验证。身份与授权将由后续后端服务提供。'
       }}
     </p>
   </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue';
+import { identityEnabled } from '../../app/features';
 import { useRoute, useRouter } from 'vue-router';
 import { assetsApi, AssetApiError } from './api';
 import { categories, statuses } from './presentation';
@@ -77,7 +78,11 @@ async function load() {
     factories.value = [];
     source.value = undefined;
     state.value =
-      error instanceof AssetApiError && [401, 403].includes(error.status) ? 'forbidden' : 'error';
+      error instanceof AssetApiError && error.status === 401 && identityEnabled
+        ? 'expired'
+        : error instanceof AssetApiError && [401, 403].includes(error.status)
+          ? 'forbidden'
+          : 'error';
   }
 }
 function selectFactory() {
@@ -239,7 +244,7 @@ function paginate(delta: number) {
   <AppOverlay v-model:open="help" title="设备只读查询接入说明" kind="drawer"
     ><h3>独立数据库，统一授权</h3>
     <p class="form-description">
-      本页面只读取后端授权范围中的基础档案。当前没有飞书或豆包登录入口，已有平台会话由服务端校验；本轮仅在隔离合成测试环境验证。
+      {{ identityEnabled ? '本页面只读取后端授权范围中的基础档案。飞书身份与平台会话由后端校验；豆包通道尚未接入。' : '本页面只读取后端授权范围中的基础档案。当前没有飞书或豆包登录入口，已有平台会话由服务端校验；本轮仅在隔离合成测试环境验证。' }}
     </p>
     <ul class="guidance-list">
       <li>新增、编辑、导出、附件与其他运维业务仍待开发。</li>

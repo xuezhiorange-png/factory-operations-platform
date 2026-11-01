@@ -66,6 +66,15 @@ REQUIRED = [
     "docs/api/M1_01_ASSET_READ.md",
     "docs/delivery/M1_01_VERIFICATION.md",
     "docs/delivery/M1_NEXT_TASKS.md",
+    "backend/migrations/versions/0002_feishu_sessions.py",
+    "backend/src/factory_ops/application/auth.py",
+    "backend/src/factory_ops/infrastructure/identity/feishu.py",
+    "frontend/playwright.identity.config.ts",
+    "frontend/identity-tests/auth.spec.ts",
+    "docs/architecture/ADR-0006-feishu-platform-sessions.md",
+    "docs/api/M1_02_IDENTITY_ACCESS.md",
+    "docs/delivery/M1_02A_VERIFICATION.md",
+    "docs/delivery/screenshots/m1-02/README.md",
 ]
 REQUIRED.extend(
     f"docs/delivery/screenshots/m0-5/{name}.png"

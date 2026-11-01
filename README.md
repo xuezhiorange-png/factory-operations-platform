@@ -1,5 +1,11 @@
 # 加工厂设备运维管理平台 / Factory Operations Platform
 
+M1-02A 新增飞书服务端身份交换、PC/H5 登录入口、待授权账号及安全平台会话。
+真实飞书 **UNVERIFIED**，缺配置时通道关闭；认证开关、HTTPS 与隔离测试说明见
+[交付记录](docs/delivery/M1_02A_VERIFICATION.md) 和
+[身份 API](docs/api/M1_02_IDENTITY_ACCESS.md)。以下 M1-01 记录作为基础能力说明保留，
+其“登录尚未实现”仅代表当时状态；完整人员授权生命周期在独立 B PR 接续。
+
 > **M1-01 最小真实业务基础，等待评审，未部署。** 保留 M0.5 PC/H5 空壳，新增独立 PostgreSQL、
 > 三角色工厂隔离及设备台账只读 API。飞书/豆包身份仍待官方适配，无正式登录、设备写入或生产数据。
 

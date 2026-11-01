@@ -94,6 +94,15 @@ jobs:
       - name: Verify real API and PostgreSQL in PC and H5 (no auth artifacts)
         working-directory: frontend
         run: npm run test:business
+      - name: Build identity capability separately
+        working-directory: frontend
+        env:
+          VITE_ASSETS_API_ENABLED: 'true'
+          VITE_IDENTITY_ENABLED: 'true'
+        run: npm run build -- --outDir dist-identity
+      - name: Verify HTTPS OAuth and sessions with synthetic Feishu transport
+        working-directory: frontend
+        run: npm run test:identity
       - name: Preserve browser verification evidence
         if: always()
         uses: actions/upload-artifact@v4

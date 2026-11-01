@@ -13,7 +13,8 @@
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "test:business": "playwright test --config playwright.business.config.ts"
+    "test:business": "playwright test --config playwright.business.config.ts",
+    "test:identity": "playwright test --config playwright.identity.config.ts"
   },
   "dependencies": {
     "@lucide/vue": "^1.66.0",

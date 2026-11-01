@@ -2,12 +2,9 @@
 
 from factory_ops.application.errors import IdentityUnavailable
 from factory_ops.application.identity import ExternalIdentity
-
-
-class FeishuIdentityProvider:
-    def authenticate(self, credential: str) -> ExternalIdentity:
-        # Future: official server-side exchange, tenant/app binding, replay/expiry checks.
-        raise IdentityUnavailable
+from factory_ops.infrastructure.identity.feishu import (
+    FeishuIdentityProvider as FeishuIdentityProvider,
+)
 
 
 class DoubaoMcpIdentityProvider:

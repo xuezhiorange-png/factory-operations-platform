@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { assetsApiEnabled } from '../../app/features';
+import { assetsApiEnabled, identityEnabled } from '../../app/features';
 import { navigation } from '../../app/navigation';
 import AppIcon from '../components/AppIcon.vue';
 import AppOverlay from '../components/AppOverlay.vue';
 import EmptyState from '../components/EmptyState.vue';
 import SidebarNavigation from '../components/SidebarNavigation.vue';
+import { account, accountLabel, roleNames } from '../../modules/identity/account';
+import IdentityPanel from '../../modules/identity/IdentityPanel.vue';
+import IdentityNotice from '../../modules/identity/IdentityNotice.vue';
 const route = useRoute();
+const factoryLabel = computed(() =>
+  identityEnabled
+    ? (account.user?.factories.find(
+        (f) => f.id === (route.query.factory || account.selectedFactory),
+      )?.name ?? '无可用工厂')
+    : '未选择工厂',
+);
 const sidebarOpen = ref(false);
 const narrowScreen = window.matchMedia('(max-width: 760px)');
 const isNarrow = ref(narrowScreen.matches);
@@ -68,7 +78,7 @@ function focusMain() {
             <AppIcon name="Search" :size="17" /><span>搜索页面</span></button
           ><span class="topbar-rule"></span
           ><button class="factory-button" @click="factoryOpen = true">
-            <AppIcon name="Building2" :size="17" /><span>未选择工厂</span
+            <AppIcon name="Building2" :size="17" /><span>{{ factoryLabel }}</span
             ><AppIcon name="ChevronDown" :size="14" /></button
           ><button
             class="icon-button desktop-message"
@@ -78,10 +88,24 @@ function focusMain() {
             <AppIcon name="Bell" /></button
           ><button
             class="account-button"
-            :aria-label="assetsApiEnabled ? '身份接入说明' : '账号状态：未登录'"
+            :class="{ 'identified-account': identityEnabled && account.user }"
+            :aria-label="
+              identityEnabled
+                ? '当前账号：' + accountLabel
+                : assetsApiEnabled
+                  ? '身份接入说明'
+                  : '账号状态：未登录'
+            "
             @click="accountOpen = true"
           >
-            <AppIcon name="CircleUserRound" :size="24" />
+            <AppIcon name="CircleUserRound" :size="24" /><span
+              v-if="identityEnabled && account.user"
+              class="account-summary"
+              >{{ accountLabel
+              }}<small>{{
+                account.user.role ? roleNames[account.user.role] : '账号待授权'
+              }}</small></span
+            >
           </button>
         </div>
       </header>
@@ -100,9 +124,14 @@ function focusMain() {
             ></template
           >
         </nav>
-        <main id="main-content" tabindex="-1"><RouterView :key="route.path" /></main>
+        <main id="main-content" tabindex="-1">
+          <IdentityNotice v-if="identityEnabled" /><RouterView :key="route.path" />
+        </main>
         <footer class="workspace-footer">
-          <span>加工厂设备运维管理平台</span><span>界面预览 · 无真实业务数据</span>
+          <span>加工厂设备运维管理平台</span
+          ><span>{{
+            identityEnabled ? '设备只读查询 · 其余模块待接入' : '界面预览 · 无真实业务数据'
+          }}</span>
         </footer>
       </div>
     </div>
@@ -127,28 +156,44 @@ function focusMain() {
       <p class="inline-hint">仅搜索页面名称，不搜索工厂或业务记录。</p></AppOverlay
     >
     <AppOverlay v-model:open="factoryOpen" :title="assetsApiEnabled ? '工厂查询范围' : '选择工厂'"
+      ><template v-if="identityEnabled"
+        ><p v-if="!account.user?.factories.length">尚无工厂授权</p>
+        <div class="identity-factory-links">
+          <RouterLink
+            v-for="factory in account.user?.factories"
+            :key="factory.id"
+            :to="{ path: '/assets', query: { factory: factory.id } }"
+            class="button secondary"
+            @click="factoryOpen = false"
+            >{{ factory.name }}</RouterLink
+          >
+        </div></template
       ><EmptyState
+        v-else
         icon="Building2"
         :title="assetsApiEnabled ? '设备页按服务端授权选择工厂' : '工厂组织尚未接入'"
         description="接入组织与工厂服务后，这里将展示经后端授权的工厂范围。"
       /><template #footer
         ><button class="button secondary" @click="factoryOpen = false">关闭</button
-        ><button class="button primary" disabled>工厂切换待开发</button></template
+        ><button v-if="!identityEnabled" class="button primary" disabled>
+          工厂切换待开发
+        </button></template
       ></AppOverlay
     >
     <AppOverlay v-model:open="accountOpen" title="账号与消息" kind="drawer"
-      ><EmptyState
-        icon="CircleUserRound"
-        :title="assetsApiEnabled ? '飞书与豆包身份通道待接入' : '身份服务尚未接入'"
-        :description="
-          assetsApiEnabled
-            ? '设备查询仅接受后端验证的平台会话，本界面不提供登录、角色切换或消息服务。'
-            : '当前没有已登录账号、角色或消息。飞书身份与本地授权将在后续阶段接入。'
-        " /><RouterLink
-        to="/settings?tab=roles"
-        class="button secondary"
-        @click="accountOpen = false"
-        >查看三角色设计<AppIcon name="ArrowRight" :size="16" /></RouterLink
+      ><IdentityPanel v-if="identityEnabled" /><template v-else
+        ><EmptyState
+          icon="CircleUserRound"
+          :title="assetsApiEnabled ? '飞书与豆包身份通道待接入' : '身份服务尚未接入'"
+          :description="
+            assetsApiEnabled
+              ? '设备查询仅接受后端验证的平台会话，本界面不提供登录、角色切换或消息服务。'
+              : '当前没有已登录账号、角色或消息。飞书身份与本地授权将在后续阶段接入。'
+          " /><RouterLink
+          to="/settings?tab=roles"
+          class="button secondary"
+          @click="accountOpen = false"
+          >查看三角色设计<AppIcon name="ArrowRight" :size="16" /></RouterLink></template
     ></AppOverlay>
   </div>
 </template>

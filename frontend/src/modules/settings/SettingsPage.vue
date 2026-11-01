@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { assetsApiEnabled } from '../../app/features';
+import { assetsApiEnabled, identityEnabled } from '../../app/features';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { managementRoles } from './roles';
@@ -101,7 +101,7 @@ function showHelp(kind: string) {
               ><span class="status-pill neutral">未接入</span>
             </div>
             <h3>飞书企业应用</h3>
-            <p>预留工作台 H5、身份入口与消息通知。飞书身份不自动授予工厂或管理权限。</p>
+            <p>{{ identityEnabled ? '已提供 PC/H5 身份流程，应用凭据仅在服务端配置。通讯录同步与通知尚未接入；飞书身份不会自动授予权限。' : '预留工作台 H5、身份入口与消息通知。飞书身份不自动授予工厂或管理权限。' }}</p>
             <div class="integration-card-actions">
               <button class="button secondary" @click="showHelp('feishu')">
                 查看接入边界<AppIcon name="ArrowRight" :size="16" /></button
@@ -162,7 +162,7 @@ function showHelp(kind: string) {
     <p class="form-description">
       {{
         help === 'feishu'
-          ? '当前未加载飞书 SDK，不请求登录凭证、不创建应用、不发送通知，也不读取员工资料。后续由后端校验企业身份并绑定本地用户，按工厂校验授权。'
+          ? (identityEnabled ? 'PC/H5 使用官方 OAuth 重定向，后端交换授权码并校验租户及用户，平台独立保存授权。未配置时认证关闭，通讯录同步和通知尚未接入。' : '当前未加载飞书 SDK，不请求登录凭证、不创建应用、不发送通知，也不读取员工资料。后续由后端校验企业身份并绑定本地用户，按工厂校验授权。')
           : '当前不访问监控服务。后续仅使用经确认的只读 API，保留设备、机位、位置、测点的独立身份与映射有效期；告警恢复不自动关闭工单。'
       }}
     </p>

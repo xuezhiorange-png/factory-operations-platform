@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { identityEnabled } from "../../app/features";
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { assetsApi, AssetApiError } from "./api";
@@ -43,7 +44,7 @@ async function load() {
   } catch (error) {
     if (current !== generation || controller.signal.aborted) return;
     state.value =
-      error instanceof AssetApiError && [401, 403].includes(error.status)
+      error instanceof AssetApiError && error.status === 401 && identityEnabled ? "expired" : error instanceof AssetApiError && [401, 403].includes(error.status)
         ? "forbidden"
         : error instanceof AssetApiError && error.status === 404
           ? "not-found"
