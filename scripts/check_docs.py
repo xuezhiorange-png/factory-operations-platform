@@ -33,7 +33,26 @@ REQUIRED = [
     "docs/delivery/PILOT_CHECKLIST.md",
     "docs/delivery/CODEX_TASK_M0.md",
     "docs/delivery/LOCAL_VERIFICATION.md",
+    "docs/architecture/ADR-0003-platform-shell.md",
+    "docs/architecture/FRONTEND_SHELL.md",
+    "docs/delivery/M0_5_VERIFICATION.md",
+    "docs/delivery/screenshots/m0-5/README.md",
+    "frontend/src/app/router.ts",
+    "frontend/src/shared/layouts/DesktopLayout.vue",
+    "frontend/src/shared/layouts/MobileLayout.vue",
+    "frontend/src/tokens.css",
+    "frontend/playwright.config.ts",
+    "frontend/tests/shell.spec.ts",
+    "frontend/tests/screenshots.spec.ts",
 ]
+REQUIRED.extend(
+    f"docs/delivery/screenshots/m0-5/{name}.png"
+    for name in (
+        "pc-workbench", "pc-assets", "pc-asset-detail", "pc-work-order", "pc-roles",
+        "pc-integrations", "mobile-home", "mobile-tasks", "mobile-scan", "mobile-messages",
+        "mobile-me", "mobile-asset-detail",
+    )
+)
 missing = [path for path in REQUIRED if not (ROOT / path).is_file()]
 if missing:
     raise SystemExit("Missing required files:\n" + "\n".join(missing))
@@ -59,6 +78,6 @@ if broken_links:
     raise SystemExit("Broken local document links:\n" + "\n".join(broken_links))
 
 print(
-    f"M0 documentation baseline OK ({len(REQUIRED)} required files, "
+    f"Platform documentation baseline OK ({len(REQUIRED)} required files, "
     f"{checked_links} local links checked; external URLs/anchors not verified)"
 )
