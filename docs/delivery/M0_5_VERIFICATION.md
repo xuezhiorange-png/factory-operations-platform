@@ -25,7 +25,8 @@ TASK_ID：`FACTORY_OPS_M0_5_PLATFORM_SHELL`
 | Actions 静态检查 | PASS | actionlint 1.7.7，CI 增加 Chromium/E2E 与验证 artifact，无部署 |
 | 文档基线与本地链接 | PASS | `.venv/bin/python scripts/check_docs.py` |
 | 主要页面截图 | PASS | 12 张实际 Chromium 截图，PC 1440×1060（全页），H5 390×844（视口） |
-| GitHub 远程 CI / Draft PR | PENDING | 推送后核对真实作业及最新 SHA，不以本地检查冒充远程结果 |
+| GitHub 远程 CI | PASS（首轮导入 SHA） | 已读取真实 push 三作业及前端日志，64 项浏览器检查通过；SHA 与运行链接见下 |
+| Draft PR | PASS | [PR #2](https://github.com/xuezhiorange-png/factory-operations-platform/pull/2)，OPEN / Draft，base=codex/m0-bootstrap |
 
 复现（在 frontend，安装 Node 22.12+ 与 npm 10 后）：
 
@@ -43,6 +44,20 @@ CAPTURE_SHELL_SCREENSHOTS=1 npm run test:e2e -- --grep '交付截图'
 浏览器回归基于生产构建的本地 preview（仅 127.0.0.1:4173），无需后端，不是部署。
 测试会阻断并检查非本地请求、业务 `/api/` 请求和所有写请求；同时检查未捕获的浏览器异常。
 扫码检查替换 getUserMedia 为拒绝探针，确认页面没有调用相机；不访问真实设备。
+
+## 远程交付证据
+
+[Draft PR #2](https://github.com/xuezhiorange-png/factory-operations-platform/pull/2) 已创建，
+base 为 `codex/m0-bootstrap`，head 为 `codex/m0-5-platform-shell`；85 个增量文件、12 张截图，后端文件无变化。
+M0 PR #1 仍为 Draft，不在本轮改动或合并。
+
+首轮导入提交：`c0347ca421e430a428b637cf48c4c1ee3fcfa5d8`。
+[实际 push 运行 41298234721](https://github.com/xuezhiorange-png/factory-operations-platform/actions/runs/41298234721)
+的 Backend / Frontend / Docs 三个作业均 success；前端日志已核实类型检查、构建和 **64 passed**，验证 artifact 上传成功。
+
+此处记录已完成的导入提交证据，后续补充文档提交的状态以
+[PR #2 Checks](https://github.com/xuezhiorange-png/factory-operations-platform/pull/2/checks) 及 PR 正文的最新 HEAD_SHA 为准，
+不将旧 SHA 的通过结果替代新 SHA 验证。
 
 ## 截图
 
