@@ -8,6 +8,14 @@ TASK_ID：`FACTORY_OPS_M0_5_PLATFORM_SHELL`
 在 M0 的 Vue 3 / TypeScript 工程上增加平台空壳，不创建业务数据库、业务 API、认证实现或真实数据。
 M0 PR 尚未合并，独立分支 `codex/m0-5-platform-shell` 依赖 `codex/m0-bootstrap`，不覆盖或合并 M0。
 
+## M0 合并后的基线更新（2026-11-01）
+
+- M0 [PR #1](https://github.com/xuezhiorange-png/factory-operations-platform/pull/1) 已以普通 Merge Commit `2f23bb38af875157ea4811d5d0b7b5287912008c` 合并至 `main`。
+- 本 M0.5 [PR #2](https://github.com/xuezhiorange-png/factory-operations-platform/pull/2) 的目标分支随后由 `codex/m0-bootstrap` 改为 `main`，历史依赖记录保留作为开发背景。
+- 合并前需按最新提交重新验证 GitHub Actions 的 Backend、Frontend、Docs 作业；在校验结果通过前不得声称合并成功。
+- 本次 ADR 维护不新增业务 API、数据库、登录、飞书接入、监控写入或生产部署。
+
+
 - PC 与 H5 分别使用 DesktopLayout 和 MobileLayout，共享颜色、组件、模块视图和接口类型。
 - Vue Router 使用 hash history；直接访问 `/#/assets` 或 `/#/m/tasks` 后刷新不需要服务端 rewrite。
   首次进入根路径时，宽度不超过 760px 进入 H5，否则进入管理端；显式链接可切换界面，不因旋转屏幕强制跳页。
