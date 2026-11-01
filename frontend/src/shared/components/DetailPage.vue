@@ -1,35 +1,50 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { DetailConfig } from '../types';
-import { useShell } from '../composables/useShell';
-import AppIcon from './AppIcon.vue';
-import PageHeader from './PageHeader.vue';
-import EmptyState from './EmptyState.vue';
-import UiTabs from './UiTabs.vue';
-import ShellNotice from './ShellNotice.vue';
-const props = defineProps<{ config: DetailConfig }>();
+import { ref } from "vue";
+import type { RouteLocationRaw } from "vue-router";
+import type { DetailConfig } from "../types";
+import { useShell } from "../composables/useShell";
+import AppIcon from "./AppIcon.vue";
+import PageHeader from "./PageHeader.vue";
+import EmptyState from "./EmptyState.vue";
+import UiTabs from "./UiTabs.vue";
+import ShellNotice from "./ShellNotice.vue";
+const props = defineProps<{
+  config: DetailConfig;
+  record?: { label: string; values: Record<string, string> };
+  backTo?: RouteLocationRaw;
+}>();
 const { pathFor } = useShell();
 const tab = ref(props.config.tabs[0]!);
 </script>
 <template>
-  <RouterLink class="back-link" :to="pathFor(config.moduleId)"
+  <RouterLink class="back-link" :to="backTo ?? pathFor(config.moduleId)"
     ><AppIcon name="ArrowLeft" :size="16" />返回{{ config.parent }}</RouterLink
   >
-  <PageHeader :title="config.title" :description="config.description" eyebrow="DETAIL STRUCTURE">
+  <PageHeader
+    :title="config.title"
+    :description="config.description"
+    :eyebrow="record ? 'ASSET DETAIL' : 'DETAIL STRUCTURE'"
+  >
     <template #actions
-      ><button class="button primary" disabled :title="`${config.action}待开发`">
+      ><button
+        class="button primary"
+        disabled
+        :title="`${config.action}待开发`"
+      >
         {{ config.action }}<span class="button-tag">待开发</span>
       </button></template
     >
   </PageHeader>
-  <ShellNotice detail />
+  <slot name="notice"><ShellNotice detail /></slot>
   <div class="detail-heading panel">
     <div class="detail-symbol"><AppIcon :name="config.icon" :size="28" /></div>
     <div>
-      <h2>{{ config.title }}结构预览</h2>
-      <p>尚未加载实体资料</p>
+      <h2>{{ record ? record.label : `${config.title}结构预览` }}</h2>
+      <p>{{ record ? "后端授权范围内的设备基础档案" : "尚未加载实体资料" }}</p>
     </div>
-    <span class="status-pill neutral">业务未接入</span>
+    <span class="status-pill neutral">{{
+      record ? "只读查询" : "业务未接入"
+    }}</span>
   </div>
   <div class="detail-grid">
     <section class="panel detail-main">
@@ -37,7 +52,7 @@ const tab = ref(props.config.tabs[0]!);
         <dl v-if="tab === config.tabs[0]" class="detail-fields">
           <div v-for="field in config.fields" :key="field">
             <dt>{{ field }}</dt>
-            <dd>—</dd>
+            <dd>{{ record?.values[field] || "—" }}</dd>
           </div>
         </dl>
         <EmptyState
@@ -46,7 +61,13 @@ const tab = ref(props.config.tabs[0]!);
           description="接入业务服务后，将展示该记录关联的信息与完整履历。"
           :icon="config.icon"
         />
-        <p class="detail-note">仅展示字段与信息层级，不代表存在真实{{ config.title }}记录。</p>
+        <p class="detail-note">
+          {{
+            record
+              ? "仅接入基础字段；附件、机位、巡检与维修记录仍未接入。"
+              : `仅展示字段与信息层级，不代表存在真实${config.title}记录。`
+          }}
+        </p>
       </UiTabs>
     </section>
     <aside class="detail-aside">

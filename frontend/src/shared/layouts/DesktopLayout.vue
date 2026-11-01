@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { assetsApiEnabled } from '../../app/features';
 import { navigation } from '../../app/navigation';
 import AppIcon from '../components/AppIcon.vue';
 import AppOverlay from '../components/AppOverlay.vue';
@@ -75,7 +76,11 @@ function focusMain() {
             @click="accountOpen = true"
           >
             <AppIcon name="Bell" /></button
-          ><button class="account-button" aria-label="账号状态：未登录" @click="accountOpen = true">
+          ><button
+            class="account-button"
+            :aria-label="assetsApiEnabled ? '身份接入说明' : '账号状态：未登录'"
+            @click="accountOpen = true"
+          >
             <AppIcon name="CircleUserRound" :size="24" />
           </button>
         </div>
@@ -121,10 +126,10 @@ function focusMain() {
       </div>
       <p class="inline-hint">仅搜索页面名称，不搜索工厂或业务记录。</p></AppOverlay
     >
-    <AppOverlay v-model:open="factoryOpen" title="选择工厂"
+    <AppOverlay v-model:open="factoryOpen" :title="assetsApiEnabled ? '工厂查询范围' : '选择工厂'"
       ><EmptyState
         icon="Building2"
-        title="工厂组织尚未接入"
+        :title="assetsApiEnabled ? '设备页按服务端授权选择工厂' : '工厂组织尚未接入'"
         description="接入组织与工厂服务后，这里将展示经后端授权的工厂范围。"
       /><template #footer
         ><button class="button secondary" @click="factoryOpen = false">关闭</button
@@ -134,8 +139,12 @@ function focusMain() {
     <AppOverlay v-model:open="accountOpen" title="账号与消息" kind="drawer"
       ><EmptyState
         icon="CircleUserRound"
-        title="身份服务尚未接入"
-        description="当前没有已登录账号、角色或消息。飞书身份与本地授权将在后续阶段接入。" /><RouterLink
+        :title="assetsApiEnabled ? '飞书与豆包身份通道待接入' : '身份服务尚未接入'"
+        :description="
+          assetsApiEnabled
+            ? '设备查询仅接受后端验证的平台会话，本界面不提供登录、角色切换或消息服务。'
+            : '当前没有已登录账号、角色或消息。飞书身份与本地授权将在后续阶段接入。'
+        " /><RouterLink
         to="/settings?tab=roles"
         class="button secondary"
         @click="accountOpen = false"

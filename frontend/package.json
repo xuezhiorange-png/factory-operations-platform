@@ -12,7 +12,8 @@
     "typecheck": "vue-tsc --noEmit && tsc --noEmit -p tsconfig.e2e.json",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:business": "playwright test --config playwright.business.config.ts"
   },
   "dependencies": {
     "@lucide/vue": "^1.66.0",

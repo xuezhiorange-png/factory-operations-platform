@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { assetsApiEnabled } from '../../app/features';
 import AppIcon from '../../shared/components/AppIcon.vue';
 </script>
 <template>
@@ -10,15 +11,18 @@ import AppIcon from '../../shared/components/AppIcon.vue';
   <section class="panel profile-card">
     <span class="profile-symbol"><AppIcon name="CircleUserRound" :size="33" /></span>
     <div>
-      <h2>身份服务尚未接入</h2>
-      <p>未登录 · 未分配角色或工厂</p>
+      <h2>{{ assetsApiEnabled ? '外部身份通道待接入' : '身份服务尚未接入' }}</h2>
+      <p>{{ assetsApiEnabled ? '本页不提供登录或角色切换' : '未登录 · 未分配角色或工厂' }}</p>
     </div>
     <span class="status-pill neutral">预览</span>
   </section>
   <section class="panel profile-menu">
     <RouterLink to="/m/settings?tab=organization"
       ><AppIcon name="Building2" />
-      <div><strong>组织与工厂</strong><small>工厂服务未接入</small></div>
+      <div>
+        <strong>组织与工厂</strong
+        ><small>{{ assetsApiEnabled ? '设备页按后端授权范围查询' : '工厂服务未接入' }}</small>
+      </div>
       <AppIcon name="ChevronRight" :size="17" /></RouterLink
     ><RouterLink to="/m/settings?tab=roles"
       ><AppIcon name="ShieldCheck" />
@@ -36,6 +40,12 @@ import AppIcon from '../../shared/components/AppIcon.vue';
   </section>
   <div class="profile-boundary">
     <AppIcon name="Fingerprint" :size="23" />
-    <p>本轮没有模拟登录、角色切换或虚假权限验证。身份与授权将由后续后端服务提供。</p>
+    <p>
+      {{
+        assetsApiEnabled
+          ? '设备只读查询通过后端逐次校验会话与权限。飞书与豆包身份接入仍未实现，本页不会展示虚假登录状态。'
+          : '本轮没有模拟登录、角色切换或虚假权限验证。身份与授权将由后续后端服务提供。'
+      }}
+    </p>
   </div>
 </template>

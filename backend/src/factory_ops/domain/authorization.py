@@ -1,7 +1,7 @@
-"""Minimal *pure* role-and-factory policy examples.
+"""Pure three-role/factory policy, reused by the M1 asset read application service.
 
-M0 does NOT provide authentication or server-side endpoint authorization.
-These policies are preparation for M1; using them alone is NOT sufficient to secure APIs.
+Authentication and fresh persisted grants belong to the application/infrastructure layers.
+Work-order policy remains preparatory; there is no work-order API in M1-01.
 """
 
 from dataclasses import dataclass

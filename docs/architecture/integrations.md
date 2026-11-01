@@ -1,5 +1,10 @@
 # M0 外部系统集成边界（待审计）
 
+M1-01 新增独立 `FeishuIdentityProvider` / `DoubaoMcpIdentityProvider` 与共用应用服务的
+两个只读 MCP 工具契约，实际 provider 均失败关闭；未连接任何正式外部系统。
+当前身份信任与 `x-aily-jwt` 官方校验待办见 [身份适配设计](IDENTITY_ADAPTERS_M1.md)，
+工具输入输出见 [M1-01 契约](../api/M1_01_ASSET_READ.md)。以下原监控边界保持不变。
+
 ## 飞书
 
 - 建议：企业自建应用 / 工作台 H5 + 组织成员同步 + 机器人通知。

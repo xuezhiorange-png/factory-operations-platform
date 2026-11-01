@@ -1,79 +1,106 @@
 # 加工厂设备运维管理平台 / Factory Operations Platform
 
-> **M0.5 平台界面空壳（2026-11-01）**。在 M0 基础上实现 PC 管理端与移动 H5 页面框架、导航、交互展示和 CI。**尚未实现实际设备台账、登录授权、巡检、报修或监控联动；不得用于生产。**
+> **M1-01 最小真实业务基础，等待评审，未部署。** 保留 M0.5 PC/H5 空壳，新增独立 PostgreSQL、
+> 三角色工厂隔离及设备台账只读 API。飞书/豆包身份仍待官方适配，无正式登录、设备写入或生产数据。
 
-## 目标
+## 当前能力
 
-多加工厂全厂设备管理。管理角色仅三类：**集团负责人、工程师、加工厂设备管理员**。员工报修和被指派执行是受限业务入口，不属于第四个管理角色。移动端通过飞书工作台 H5 使用；冷库监控仅作为受控只读数据源。
+- Python 3.12+ / FastAPI / SQLAlchemy 2 / Alembic / PostgreSQL 17，单仓库模块化单体。
+- Vue 3 / TypeScript / Vite，Node 22.12+（推荐 22 LTS），依赖锁文件已提交。
+- 三种管理角色：集团负责人、工程师、加工厂设备管理员；角色及工厂授权由后端逐次从数据库读取。
+- 工厂列表、厂内设备列表/搜索及详情；PC 台账与 PC/H5 详情可开启真实只读查询。
+- `FeishuIdentityProvider`、`DoubaoMcpIdentityProvider` 保留独立边界，当前失败关闭；
+  两个只读 MCP 工具仅契约与测试，无豆包网络连接、无写工具。
+- GitHub Actions 执行真实隔离 PostgreSQL 测试及既有 PC/H5 回归，不自动部署业务版本。
 
-## 技术
+巡检、报修、工单、保养、库存、附件、实际登录/会话签发及授权管理仍未实现。
+飞书和豆包是未来接入渠道，设备事实保存在独立数据库。不得用于生产。
 
-- 后端：Python 3.12+ / FastAPI，计划使用 SQLAlchemy 2、Alembic、PostgreSQL
-- 前端：Node 22.12+（推荐 22 LTS）/ Vue 3 / TypeScript / Vite；M0.5 包含模块化管理端与 H5 空壳
-- CI：GitHub Actions（后端测试、静态检查、前端构建/浏览器回归、文档基线检查）
-- 业务模块分层：API → Application → Domain，外部系统隔离在 Infrastructure/Adapters
-- 生产部署、飞书凭据、监控系统访问权限都不包含在此工程包里
+## 本地运行
 
-## 本地开发
+先阅读 [AGENTS.md](AGENTS.md)、[V1.3 PRD](docs/product/PRD_V1.3.md) 与
+[ADR-0005](docs/architecture/ADR-0005-minimal-business-foundation.md)。本轮 M1-01 授权范围与实现
+见 [验证记录](docs/delivery/M1_01_VERIFICATION.md)，不改变历史 M0 的交付记录。
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\\Scripts\\activate
+source .venv/bin/activate
 python -m pip install -e './backend[dev]'
+# 不接数据库也可运行健康检查；不是业务 readiness
 uvicorn factory_ops.api.app:app --reload --port 8000
-# GET http://127.0.0.1:8000/api/v1/health  -> {"status":"ok", ...}
 
 cd frontend
-nvm use                  # 如已安装 nvm；未安装时自行使用 Node 22.12+ / 24
-npm ci
+nvm use
+npm ci --no-audit --no-fund
 npm run dev
-# 浏览器打开 http://127.0.0.1:5173；Vite 将 /api 代理到 8000
 ```
 
-已在联网开发环境生成 `frontend/package-lock.json`，并使用 Node 22 完成 `npm ci`、Vue 类型检查和构建。
-CI 使用同一锁文件与 `frontend/.nvmrc`；远程 Actions 与 Draft PR 的实际状态见
-[验证记录](docs/delivery/LOCAL_VERIFICATION.md)。健康检查仅代表进程存活，不代表数据库或集成就绪。
+默认浏览 `http://127.0.0.1:5173/#/workbench` 或 `/#/m/home`，设备模块仍是未接入的空壳。
+不需要数据库，不会生成设备或假账号。
+
+需要数据库评审时，先复制 `.env.example` 为本地 `.env`，替换开发占位密码；不要提交 `.env`。
+仅在独立开发环境运行 `docker compose --env-file .env -f docker-compose.dev.yml up -d db`，
+不要复用生产/其他项目数据库。通过安全的本地方式向进程环境注入对应 `DATABASE_URL`
+（`postgresql+psycopg`，Alembic/应用不会自动加载 `.env`），在项目根目录执行：
+
+```bash
+alembic -c backend/alembic.ini upgrade head
+uvicorn factory_ops.bootstrap:app --reload --port 8000
+# 另一个终端，在 frontend/ 中开启设备查询能力
+VITE_ASSETS_API_ENABLED=true npm run dev
+```
+
+迁移只建表，不插入账号或资产。真实业务端点需要有效平台会话，无会话返回 401、页面显示无权限；
+开关不会授予权限。本轮没有模拟登录或产品内测试身份选择器。完整浏览器联调使用隔离合成 fixture，
+见下述验证文档；正式身份接入见 [身份适配设计](docs/architecture/IDENTITY_ADAPTERS_M1.md)。
+
+Vite 开发/本地 preview 代理 `/api` 到 loopback 8000（测试可显式配置
+`FACTORY_OPS_API_PROXY_TARGET`）。静态 build 不提供代理；未来受控环境需另配同源反向代理与 TLS。
+本轮不执行部署。
 
 ## 测试
 
 ```bash
 python -m pytest -q backend/tests
-python scripts/check_docs.py
 ruff check backend scripts
-cd frontend && npm run build
+python scripts/check_docs.py
+cd frontend
+npm run build
 npx playwright install --with-deps chromium
 npm run test:e2e
+VITE_ASSETS_API_ENABLED=true npm run build -- --outDir dist-business
+npm run test:business
 ```
 
-## 目录
+真实数据库测试必须设置 `FACTORY_OPS_TEST_DATABASE_URL`，只允许专用 loopback
+`factory_ops_test` 数据库；每个测试使用临时 schema 并经 Alembic 建表/清理。
+没有该环境变量时后端集成测试会跳过，不能算业务验证通过；CI 显式创建独立 PostgreSQL service，
+执行全部后端和浏览器联调。认证测试关闭 trace/截图/视频/HTML 产物，凭据留在 checkout 外私有临时文件。
+命令、结果、迁移/回滚与风险见 [M1-01 验证记录](docs/delivery/M1_01_VERIFICATION.md)。
 
+## 目录与契约
+
+```text
+backend/src/factory_ops/api/             HTTP 白名单 DTO 与只读路由
+backend/src/factory_ops/application/     共用查询服务、身份/MCP/持久化端口
+backend/src/factory_ops/domain/          纯领域设备 DTO、三角色策略
+backend/src/factory_ops/infrastructure/  PostgreSQL、失败关闭的身份适配器
+backend/migrations/                     Alembic 修订
+frontend/src/modules/assets/            既有页面、真实 API 客户端与查询状态
+frontend/src/shared/                    公共布局与组件
+frontend/business-tests/                 浏览器→真实 API→隔离数据库
+docs/                                  PRD、ADR、契约、验证与后续任务
 ```
-backend/          FastAPI 最小入口与三角色授权策略示例
-frontend/         Vue 3 路由、公共组件、PC/H5 布局与独立业务模块空壳
-.github/workflows 基础自动化测试，**不会自动部署**
-docs/product/     V1.3 产品需求基线
-docs/architecture/架构边界、权限、ERD 草案、集成设计和 ADR
-docs/api/         已实现健康接口与后续接口目录（后续接口均未实现）
-docs/data/        资产身份、编码与导入协议草案
-docs/acceptance/  M1 台账最小验收集（尚未执行）
-docs/operations/  M0 本地运行、回滚与后续发布门槛
-docs/delivery/    M0 验收清单、试点数据、Codex 分解任务
-scripts/          只读一致性检查
-```
 
-## 安全及交付边界
+- [HTTP 与只读 MCP 契约](docs/api/M1_01_ASSET_READ.md)
+- [身份适配设计](docs/architecture/IDENTITY_ADAPTERS_M1.md)
+- [M1-02 与 M1-03 后续清单](docs/delivery/M1_NEXT_TASKS.md)
+- [M0.5 页面接入/路由](docs/architecture/FRONTEND_SHELL.md)、[历史截图](docs/delivery/screenshots/m0-5/README.md)
+- [M0.6 冻结预览](docs/delivery/M0_6_PAGES.md)：冻结工作流与源 SHA 保持原样，不发布本轮代码。
 
-1. 在**独立 GitHub 仓库**开发（本轮用户明确授权 Public 仅提交 M0 骨架），不触碰 `cold-storage-planning-agent`，也不推断它是监控系统源代码。
-2. 严禁未经授权修改/停止监控生产服务，严禁连真实 PLC 写命令，严禁直接写监控数据库。
-3. 所有业务状态变化必须在后续实现中具备事务审计、幂等和并发控制；前端隐藏按钮不等于权限控制。
-4. 只允许经测试、人工审查后合并；首个功能 PR 保持 Draft，未授权不得 Ready、合并或部署。
-5. **本工程包不包含任何正式环境的账号、密码、密钥、设备私有信息或业务数据。**
+## 安全和交付边界
 
-请先读 [AGENTS.md](AGENTS.md)、[V1.3 PRD](docs/product/PRD_V1.3.md) 和 [M0 验收清单](docs/delivery/M0_CHECKLIST.md)。
-
-M0 基线审阅见 [架构审阅](docs/architecture/M0_REVIEW.md)。
-M0.5 的 [接入说明与完整路由](docs/architecture/FRONTEND_SHELL.md)、
-[验证记录](docs/delivery/M0_5_VERIFICATION.md) 和 [主要截图](docs/delivery/screenshots/m0-5/README.md) 已提供。
-M0/M0.5 已合并后的导航与加载失败恢复补强见 [交互收尾记录](docs/delivery/M0_5_RESILIENCE.md)。
-管理端入口 `/#/workbench`，H5 入口 `/#/m/home`；前端可独立浏览，无需启动后端或数据库。
-M0 的授权策略没有接入业务 API，不构成已上线的认证/权限系统；当前不需要启动数据库。
+独立仓库中只提交源码、契约及合成测试，无员工信息、真实设备、身份令牌或飞书密钥。
+不修改既有冷库规划/监控项目，不访问生产服务器、PLC、真实业务库或正式飞书租户。
+列表、详情及未来 MCP 均复用后端授权；客户端工厂选择和 AI 参数不能代替授权。
+M1-01 在独立分支提交 Draft PR，未经另行明确授权不 Ready、Merge 或 Deploy。
