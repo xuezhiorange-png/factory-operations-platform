@@ -53,4 +53,37 @@ auth 请求校验失败不会回显可能含凭证的请求体。
 
 真实 App/租户权限、H5 无确认行为、人员变更事件及定期对账均 **UNVERIFIED**。
 实际官方资料和 Cookie 设计见 [ADR-0006](../architecture/ADR-0006-feishu-platform-sessions.md)。
-后续 B 的人员契约、数据库约束及初始化说明在独立依赖 PR 中补充。
+人员生命周期在 B 的独立依赖 PR 中实现，契约如下。
+
+## 人员接口（M1-02B）
+
+全部接口要求当前有效 Cookie 和服务端确认的集团负责人；工程师/厂管理员不能访问人员列表/历史。
+参数中的 user_id 只是待管理目标，绝不替代操作者身份。写请求另须 Origin + 会话绑定 CSRF。
+
+| 方法/路径（前缀 /api/v1） | 输入及响应 |
+|---|---|
+| GET /access/users | limit=20（1–100）、offset=0（0–100000）；`{items: Person[], total, limit, offset}` |
+| GET /access/users/{user_id}/changes | 同上分页；`{items: ChangeRecord[], total, limit, offset}` |
+| PATCH /access/users/{user_id} | `{expected_version, role, active, factory_ids, reason}`；返回 MutationResult |
+| POST /access/users/{user_id}/revoke-sessions | `{expected_version, reason}`；返回 MutationResult |
+| POST /access/users/{user_id}/unbind-feishu | 同上；停用该目标全部有效飞书绑定并撤销平台会话，返回 MutationResult |
+
+Person：`{id, display_name, role, active, factories:[{id,code,name}], feishu_binding, version}`。
+role 仅三种正式值或 null；feishu_binding 为 bound/unbound/none；不含 open_id、电话、邮件、令牌或摘要。
+集团负责人范围显示为全部启用工厂，factory_ids 必须空；无角色亦必须空；工程师可零到多个，
+厂管理员至多一个，零范围仍待授权。工厂必须真实存在且启用，重复工厂/额外字段均拒绝。
+
+expected_version 是严格正整数，active 是严格布尔值，reason 去空白后为 2–300 字符。
+版本过期、重复/无变化提交、删除最后启用集团负责人或不满足生命周期条件均返回 409 version_conflict。
+写入成功才返回 `{user: Person, reauthentication_required: bool}`，操作者修改自己时须重新登录。
+新权限只供后续有效认证使用；旧会话即使角色/工厂改回也不恢复。
+
+ChangeRecord：`{id, actor_id, action, occurred_at, details:{before,after,reason}}`。
+before/after 只含 role、active、factory_ids、feishu_binding、version，不包含员工显示名或身份凭据。
+action 为 access.changed / access.sessions_revoked / access.feishu_unbound / access.bootstrap。
+历史只读；操作者 UUID 为审计关联键。按时间降序及 ID 排序，工厂名称由当前目录展示，审计保留原 UUID。
+不存在目标 404，非法输入 422，权限/CSRF 403，无效会话 401，审计/存储故障安全 503；
+任何失败不会回传原始 SQL 或身份字段，也不会留下部分授权、会话撤销或成功审计。
+
+离线首位集团负责人说明见 [ADR-0007](../architecture/ADR-0007-access-lifecycle.md)。
+没有注册/初始化/任意身份重绑 HTTP 端点。受控停用当前可用，真实人员事件/定期对账仍 UNVERIFIED。

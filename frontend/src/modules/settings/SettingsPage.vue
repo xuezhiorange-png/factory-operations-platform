@@ -2,6 +2,8 @@
 import { assetsApiEnabled, identityEnabled } from '../../app/features';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import PeopleManagement from './people/PeopleManagement.vue';
+import { account } from '../identity/account';
 import { managementRoles } from './roles';
 import { useShell } from '../../shared/composables/useShell';
 import AppIcon from '../../shared/components/AppIcon.vue';
@@ -13,8 +15,12 @@ import AppOverlay from '../../shared/components/AppOverlay.vue';
 const route = useRoute();
 const router = useRouter();
 const { pathFor } = useShell();
-const keys = ['organization', 'roles', 'integrations', 'general'];
-const labels = ['组织与工厂', '角色与范围', '集成设置', '基础设置'];
+const keys = identityEnabled
+  ? ['organization', 'people', 'roles', 'integrations', 'general']
+  : ['organization', 'roles', 'integrations', 'general'];
+const labels = identityEnabled
+  ? ['组织与工厂', '人员管理', '角色与范围', '集成设置', '基础设置']
+  : ['组织与工厂', '角色与范围', '集成设置', '基础设置'];
 const selected = computed({
   get: () => labels[Math.max(0, keys.indexOf(String(route.query.tab ?? 'organization')))]!,
   set: (value) => {
@@ -47,18 +53,30 @@ function showHelp(kind: string) {
             新增工厂<span class="button-tag">待开发</span>
           </button>
         </header>
+        <div v-if="identityEnabled" class="identity-factory-links">
+          <p v-if="!account.user?.factories.length">暂无获授权工厂</p>
+          <RouterLink
+            v-for="factory in account.user?.factories"
+            :key="factory.id"
+            :to="{ path: pathFor('assets'), query: { factory: factory.id } }"
+            class="button secondary"
+            >{{ factory.name }}</RouterLink
+          >
+        </div>
         <EmptyState
+          v-else
           icon="Building2"
           title="组织服务尚未接入"
           description="工厂、车间、区域与位置树将在后续阶段建立，当前没有可管理的组织数据。"
       /></template>
+      <PeopleManagement v-else-if="identityEnabled && selected === '人员管理'" />
       <template v-else-if="selected === '角色与范围'"
         ><header class="settings-section-header">
           <div>
             <h2>三种管理角色</h2>
             <p>角色定义操作能力，工厂授权限定数据范围</p>
           </div>
-          <span class="status-pill neutral">设计预留</span>
+          <span class="status-pill neutral">{{ identityEnabled ? '固定三角色' : '设计预留' }}</span>
         </header>
         <div class="role-grid">
           <article v-for="role in managementRoles" :key="role.code" class="role-card">
@@ -75,9 +93,11 @@ function showHelp(kind: string) {
             <strong>独立验收，不因角色而例外</strong>
             <p>
               {{
-                assetsApiEnabled
-                  ? '任何人不得验收本人实际执行的维修工单。当前设备查询由后端验证权限，本页不提供授权修改或身份模拟。'
-                  : '任何人不得验收本人实际执行的维修工单。当前没有已登录账号、角色分配或权限验证。'
+                identityEnabled
+                  ? '任何人不得验收本人实际执行的维修工单。人员授权由集团负责人在人员管理中维护，设备访问始终由后端检查当前权限。'
+                  : assetsApiEnabled
+                    ? '任何人不得验收本人实际执行的维修工单。当前设备查询由后端验证权限，本页不提供授权修改或身份模拟。'
+                    : '任何人不得验收本人实际执行的维修工单。当前没有已登录账号、角色分配或权限验证。'
               }}
             </p>
           </div>
@@ -101,7 +121,13 @@ function showHelp(kind: string) {
               ><span class="status-pill neutral">未接入</span>
             </div>
             <h3>飞书企业应用</h3>
-            <p>{{ identityEnabled ? '已提供 PC/H5 身份流程，应用凭据仅在服务端配置。通讯录同步与通知尚未接入；飞书身份不会自动授予权限。' : '预留工作台 H5、身份入口与消息通知。飞书身份不自动授予工厂或管理权限。' }}</p>
+            <p>
+              {{
+                identityEnabled
+                  ? '已提供 PC/H5 身份流程，应用凭据仅在服务端配置。通讯录同步与通知尚未接入；飞书身份不会自动授予权限。'
+                  : '预留工作台 H5、身份入口与消息通知。飞书身份不自动授予工厂或管理权限。'
+              }}
+            </p>
             <div class="integration-card-actions">
               <button class="button secondary" @click="showHelp('feishu')">
                 查看接入边界<AppIcon name="ArrowRight" :size="16" /></button
@@ -162,7 +188,9 @@ function showHelp(kind: string) {
     <p class="form-description">
       {{
         help === 'feishu'
-          ? (identityEnabled ? 'PC/H5 使用官方 OAuth 重定向，后端交换授权码并校验租户及用户，平台独立保存授权。未配置时认证关闭，通讯录同步和通知尚未接入。' : '当前未加载飞书 SDK，不请求登录凭证、不创建应用、不发送通知，也不读取员工资料。后续由后端校验企业身份并绑定本地用户，按工厂校验授权。')
+          ? identityEnabled
+            ? 'PC/H5 使用官方 OAuth 重定向，后端交换授权码并校验租户及用户，平台独立保存授权。未配置时认证关闭，通讯录同步和通知尚未接入。'
+            : '当前未加载飞书 SDK，不请求登录凭证、不创建应用、不发送通知，也不读取员工资料。后续由后端校验企业身份并绑定本地用户，按工厂校验授权。'
           : '当前不访问监控服务。后续仅使用经确认的只读 API，保留设备、机位、位置、测点的独立身份与映射有效期；告警恢复不自动关闭工单。'
       }}
     </p>

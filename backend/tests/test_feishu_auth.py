@@ -122,7 +122,8 @@ def test_verified_login_uses_existing_internal_grants(authenticated, role):
     assert me.status_code == 200 and me.json()["id"] == str(data.users[role])
     assert len(me.json()["factories"]) == {"group": 3, "engineer": 1, "multi": 2, "admin": 1}[role]
     token = http.cookies.get(SESSION)
-    assert token not in me.text
+    credential_leaked = token in me.text
+    assert not credential_leaked
     with Session(db.engine) as session:
         row = session.scalar(select(SessionRow).where(SessionRow.token_hash == digest(token)))
         assert row.external_identity_id is not None and len(row.token_hash) == 64

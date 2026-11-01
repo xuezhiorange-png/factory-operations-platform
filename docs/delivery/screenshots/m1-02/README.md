@@ -11,6 +11,10 @@
 | 集团负责人查询 B 厂台账 | [pc-authenticated-assets.png](pc-authenticated-assets.png) |
 | H5 已认证设备详情 | [h5-authenticated-detail.png](h5-authenticated-detail.png) |
 | H5 首次登录待授权 | [h5-pending-account.png](h5-pending-account.png) |
+| PC 人员管理 | [pc-personnel.png](pc-personnel.png) |
+| PC 工程师工厂授权 | [pc-access-drawer.png](pc-access-drawer.png) |
+| PC 权限变更记录 | [pc-access-history.png](pc-access-history.png) |
+| H5 人员管理卡片 | [h5-personnel.png](h5-personnel.png) |
 
 重拍仅在隔离测试库配置完成后设置 `FACTORY_OPS_CAPTURE_SCREENSHOTS=1 npm run test:identity`。
 CI 不设置该变量，也不上传认证浏览器输出目录。

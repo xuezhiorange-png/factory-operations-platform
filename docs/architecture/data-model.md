@@ -1,5 +1,9 @@
 # 数据模型：M1-01 实际范围与 M0 全量草案
 
+M1-02 新增 oauth_flows，并扩展 users/auth_sessions/audit_events 的身份、版本与审计字段。
+迁移链、单厂管理员与撤会话约束见 [ADR-0006](ADR-0006-feishu-platform-sessions.md)、
+[ADR-0007](ADR-0007-access-lifecycle.md)。未创建第二套业务权限库。
+
 M1-01 已通过 Alembic 创建 `factories / users / user_factory_access / assets /
 external_identities / auth_sessions / audit_events` 七张表，未预置业务记录。
 实际约束、迁移与局限见 [ADR-0005](ADR-0005-minimal-business-foundation.md)。

@@ -75,6 +75,16 @@ REQUIRED = [
     "docs/api/M1_02_IDENTITY_ACCESS.md",
     "docs/delivery/M1_02A_VERIFICATION.md",
     "docs/delivery/screenshots/m1-02/README.md",
+    "backend/migrations/versions/0003_access_lifecycle.py",
+    "backend/src/factory_ops/application/access.py",
+    "backend/src/factory_ops/bootstrap_access.py",
+    "backend/tests/test_access_lifecycle.py",
+    "frontend/src/modules/settings/people/PeopleManagement.vue",
+    "frontend/identity-tests/people.spec.ts",
+    "docs/architecture/ADR-0007-access-lifecycle.md",
+    "docs/delivery/M1_02B_VERIFICATION.md",
+    "docs/delivery/M1_02_NEXT_TASKS.md",
+    "docs/delivery/M1_02_CHANGED_FILES.md",
 ]
 REQUIRED.extend(
     f"docs/delivery/screenshots/m0-5/{name}.png"

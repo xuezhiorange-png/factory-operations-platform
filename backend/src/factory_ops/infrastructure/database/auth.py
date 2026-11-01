@@ -104,7 +104,7 @@ class SqlAuthUnitOfWork(SqlReadUnitOfWork):
         if previous:
             self.session.execute(
                 update(SessionRow)
-                .where(SessionRow.token_hash == previous)
+                .where(SessionRow.token_hash == previous, SessionRow.revoked_at.is_(None))
                 .values(revoked_at=datetime.now(UTC))
             )
         self.session.add(
