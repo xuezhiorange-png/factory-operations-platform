@@ -1,5 +1,10 @@
 import { ref } from 'vue';
-import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router';
+import {
+  createRouter,
+  createWebHashHistory,
+  type RouteLocationNormalized,
+  type RouteRecordRaw,
+} from 'vue-router';
 import DesktopLayout from '../shared/layouts/DesktopLayout.vue';
 import MobileLayout from '../shared/layouts/MobileLayout.vue';
 
@@ -190,13 +195,50 @@ export const router = createRouter({
   ],
 });
 export const navigating = ref(false);
-router.beforeEach(() => {
+export const failedRoute = ref<string | null>(null);
+let pendingRoute: RouteLocationNormalized | null = null;
+
+export function reloadFailedPage() {
+  const target = failedRoute.value;
+  if (!target) return;
+  // An explicit reload also clears the browser's cached failed module import.
+  // router.resolve produces an internal hash URL, never an external destination.
+  window.history.replaceState(window.history.state, '', router.resolve(target).href);
+  window.location.reload();
+}
+
+export function returnToWorkspace() {
+  const target = failedRoute.value ?? '';
+  const destination = target.startsWith('/m/') || target === '/m' ? '/m/home' : '/workbench';
+  // Clear even when the workspace is already the current route (a duplicate navigation).
+  failedRoute.value = null;
+  // onError owns the visible failure state if this navigation also fails.
+  void router
+    .push(destination)
+    .then(() => {
+      if (!failedRoute.value)
+        document.title = `${router.currentRoute.value.meta.title} · 加工厂设备运维`;
+    })
+    .catch(() => undefined);
+}
+
+router.beforeEach((to) => {
+  pendingRoute = to;
+  failedRoute.value = null;
   navigating.value = true;
 });
-router.afterEach((to) => {
-  document.title = `${to.meta.title} · 加工厂设备运维`;
-  navigating.value = false;
+router.afterEach((to, _from, failure) => {
+  if (!failure) document.title = `${to.meta.title} · 加工厂设备运维`;
+  if (pendingRoute === to) {
+    pendingRoute = null;
+    navigating.value = false;
+  }
 });
-router.onError(() => {
+router.onError((_error, to) => {
+  // Ignore a superseded import: another navigation may already have succeeded.
+  if (pendingRoute !== to) return;
+  pendingRoute = null;
+  failedRoute.value = to.fullPath;
   navigating.value = false;
+  document.title = '页面加载失败 · 加工厂设备运维';
 });
