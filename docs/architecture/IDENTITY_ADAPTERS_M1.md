@@ -1,5 +1,15 @@
 # M1 身份适配：平台会话、飞书与豆包
 
+## M1-02A 更新
+
+FeishuIdentityProvider 已实现官方授权码交换与用户信息校验，配置完整才启用；
+目前未获得真实应用配置，真实认证 **UNVERIFIED**，默认通道关闭。
+HTTP 已增加平台会话签发/退出、一次性浏览器挑战、PKCE、Origin/CSRF 保护及当前身份接口。
+实现以 [ADR-0006](ADR-0006-feishu-platform-sessions.md) 和
+[M1-02 API](../api/M1_02_IDENTITY_ACCESS.md) 为准。
+以下保留 M1-01 的设计基线；其中“当前不可用”描述仅代表当时状态。
+豆包仍不可用，不公开 MCP 监听，不形成第二套业务权限。
+
 ## 当前可执行范围
 
 `IdentityProvider.authenticate(credential)` 返回内部身份引用，应用服务随后从数据库解析用户、

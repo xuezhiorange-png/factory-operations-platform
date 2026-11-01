@@ -45,6 +45,9 @@ class UserRow(Base):
     role: Mapped[str | None] = mapped_column(String(40))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    display_name: Mapped[str | None] = mapped_column(String(200))
+    auth_version: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
+    version: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
 
 
 class FactoryAccessRow(Base):
@@ -84,6 +87,22 @@ class SessionRow(Base):
     issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    auth_version: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
+    external_identity_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("external_identities.id", ondelete="RESTRICT")
+    )
+    csrf_hash: Mapped[str | None] = mapped_column(String(64))
+
+
+class OAuthFlowRow(Base):
+    __tablename__ = "oauth_flows"
+    state_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    browser_hash: Mapped[str] = mapped_column(String(64))
+    code_hash: Mapped[str | None] = mapped_column(String(64), unique=True)
+    return_to: Mapped[str] = mapped_column(String(600))
+    channel: Mapped[str] = mapped_column(String(8))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class AssetRow(Base):

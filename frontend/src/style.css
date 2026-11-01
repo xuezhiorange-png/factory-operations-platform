@@ -2362,3 +2362,24 @@ td {
     min-width: 110px;
   }
 }
+
+/* Identity uses the existing shell and design tokens. */
+.identity-login { min-height: 90vh; display: grid; place-items: center; padding: 24px; }
+.mobile-content .identity-login { min-height: 65vh; padding: 0; }
+.identity-login-card { width: min(100%, 460px); padding: 40px; display: grid; gap: 20px; }
+.identity-login-card h1 { font-size: 25px; letter-spacing: -.6px; }
+.identity-login-card p { line-height: 1.75; }
+.identity-login-icon { color: var(--green); }
+.identity-login-note, .identity-panel p { color: var(--muted); }
+.identity-error { color: #a43c32; }
+.identity-pending { padding: 14px; background: #fff8e7; border-radius: 8px; }
+.identity-panel { display: grid; gap: 16px; width: 100%; }
+.identity-panel h2 { font-size: 21px; }
+.identity-factories { display: grid; gap: 10px; padding-left: 20px; }
+.identity-factory-links { display: grid; gap: 10px; }
+.account-summary { display: grid; gap: 3px; text-align: left; max-width: 140px; overflow: hidden; }
+.account-summary small { font-size: 10px; color: var(--muted); }
+@media(max-width: 760px) { .identity-login-card { padding: 28px 22px; } .account-summary { display: none; } }
+.account-button.identified-account { width: auto; height: 40px; display: flex; gap: 9px; padding: 5px 10px; border-radius: 8px; background: transparent; }
+.identified-account .account-summary { white-space: nowrap; }
+@media(max-width: 760px) { .account-button.identified-account { width: 32px; padding: 0; } }

@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import AppIcon from '../../shared/components/AppIcon.vue';
 import EmptyState from '../../shared/components/EmptyState.vue';
-export type ReadState = 'loading' | 'loaded' | 'empty' | 'error' | 'forbidden' | 'not-found';
+import { useRoute } from 'vue-router';
+import { loginTarget } from '../identity/account';
+const route = useRoute();
+export type ReadState =
+  | 'loading'
+  | 'loaded'
+  | 'empty'
+  | 'error'
+  | 'forbidden'
+  | 'not-found'
+  | 'expired';
 defineProps<{ state: ReadState }>();
 defineEmits<{ retry: [] }>();
 </script>
@@ -9,6 +19,20 @@ defineEmits<{ retry: [] }>();
   <div v-if="state === 'loading'" class="loading-state" role="status" aria-busy="true">
     <AppIcon name="LoaderCircle" class="spin" /><span>正在查询设备数据…</span>
   </div>
+  <EmptyState
+    v-else-if="state === 'expired'"
+    icon="ShieldCheck"
+    title="登录已过期"
+    description="平台会话已过期或被撤销，请重新登录后查询。"
+    ><RouterLink
+      class="button primary"
+      :to="{
+        path: loginTarget(route.path),
+        query: { return_to: route.fullPath, status: 'expired' },
+      }"
+      >重新登录</RouterLink
+    ></EmptyState
+  >
   <EmptyState
     v-else-if="state === 'forbidden'"
     icon="ShieldCheck"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { identityEnabled } from '../../app/features';
 import { useRoute } from 'vue-router';
 import { navigation, navigationGroups } from '../../app/navigation';
 import AppIcon from './AppIcon.vue';
@@ -29,7 +30,8 @@ const route = useRoute();
         ><AppIcon name="ArrowUpRight" :size="15"
       /></RouterLink>
       <div class="sidebar-stage">
-        <span class="status-dot"></span>M0.5 <span>平台框架预览</span>
+        <span class="status-dot"></span>{{ identityEnabled ? 'M1' : 'M0.5' }}
+        <span>{{ identityEnabled ? '身份与台账' : '平台框架预览' }}</span>
       </div>
     </div>
   </div>

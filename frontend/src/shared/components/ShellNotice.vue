@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { assetsApiEnabled } from '../../app/features';
+import { assetsApiEnabled, identityEnabled } from '../../app/features';
 import AppIcon from './AppIcon.vue';
 withDefaults(defineProps<{ detail?: boolean }>(), { detail: false });
 </script>
@@ -7,7 +7,13 @@ withDefaults(defineProps<{ detail?: boolean }>(), { detail: false });
   <div class="shell-notice">
     <AppIcon name="Info" :size="16" /><span
       ><strong>{{
-        detail ? '详情结构预览' : assetsApiEnabled ? 'M1-01 设备查询能力' : 'M0.5 界面预览'
+        detail
+          ? '详情结构预览'
+          : identityEnabled
+            ? '设备台账已接入'
+            : assetsApiEnabled
+              ? 'M1-01 设备查询能力'
+              : 'M0.5 界面预览'
       }}</strong
       ><span class="notice-divider">·</span
       >{{

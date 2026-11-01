@@ -20,6 +20,7 @@ class ExternalIdentity:
     tenant_id: str
     app_id: str
     subject_id: str
+    display_name: str | None = None
 
 
 IdentityReference = SessionIdentity | ExternalIdentity

@@ -21,8 +21,17 @@ def test_openapi_exposes_liveness_and_only_scoped_business_reads(client: TestCli
         "/api/v1/factories",
         "/api/v1/factories/{factory_id}/assets",
         "/api/v1/factories/{factory_id}/assets/{asset_id}",
+        "/api/v1/auth/config",
+        "/api/v1/auth/feishu/start",
+        "/api/v1/auth/feishu/callback",
+        "/api/v1/auth/me",
+        "/api/v1/auth/logout",
     }
-    assert all(set(methods) == {"get"} for methods in schema["paths"].values())
+    assert all(
+        set(methods)
+        == ({"post"} if path in {"/api/v1/auth/logout", "/api/v1/auth/feishu/start"} else {"get"})
+        for path, methods in schema["paths"].items()
+    )
     assert set(schema["paths"]["/api/v1/health"]) == {"get"}
     health = schema["components"]["schemas"]["HealthResponse"]
     assert set(health["required"]) == {"status", "service", "stage"}

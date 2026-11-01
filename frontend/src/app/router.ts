@@ -7,6 +7,8 @@ import {
 } from 'vue-router';
 import DesktopLayout from '../shared/layouts/DesktopLayout.vue';
 import MobileLayout from '../shared/layouts/MobileLayout.vue';
+import { identityEnabled } from './features';
+import { account, refreshAccount, loginTarget } from '../modules/identity/account';
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -141,6 +143,11 @@ export const router = createRouter({
   },
   routes: [
     {
+      path: '/login',
+      component: () => import('../modules/identity/LoginPage.vue'),
+      meta: { title: '飞书登录' },
+    },
+    {
       path: '/',
       redirect: () => (window.matchMedia('(max-width: 760px)').matches ? '/m/home' : '/workbench'),
     },
@@ -165,6 +172,11 @@ export const router = createRouter({
       meta: { shell: 'mobile', title: '移动工作台' },
       children: [
         {
+          path: 'login',
+          component: () => import('../modules/identity/LoginPage.vue'),
+          meta: { title: '飞书工作台登录', mobileTab: 'me', mobilePage: 'me' },
+        },
+        {
           path: 'home',
           component: () => import('../modules/mobile/MobileHomePage.vue'),
           meta: { title: '移动工作台', mobilePage: 'home', mobileTab: 'home' },
@@ -182,7 +194,11 @@ export const router = createRouter({
         {
           path: 'messages',
           component: () => import('../modules/mobile/MobileMessagesPage.vue'),
-          meta: { title: '消息中心', mobilePage: 'messages', mobileTab: 'messages' },
+          meta: {
+            title: '消息中心',
+            mobilePage: 'messages',
+            mobileTab: 'messages',
+          },
         },
         {
           path: 'me',
@@ -222,10 +238,21 @@ export function returnToWorkspace() {
     .catch(() => undefined);
 }
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   pendingRoute = to;
   failedRoute.value = null;
   navigating.value = true;
+  if (identityEnabled && !['/login', '/m/login'].includes(to.path) && to.path !== '/') {
+    await refreshAccount();
+    if (!account.user)
+      return {
+        path: loginTarget(to.path),
+        query: {
+          return_to: to.fullPath,
+          ...(account.status === 'expired' ? { status: 'expired' } : {}),
+        },
+      };
+  }
 });
 router.afterEach((to, _from, failure) => {
   if (!failure) document.title = `${to.meta.title} · 加工厂设备运维`;

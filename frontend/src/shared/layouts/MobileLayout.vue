@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { identityEnabled } from '../../app/features';
+import IdentityNotice from '../../modules/identity/IdentityNotice.vue';
 import { useRoute } from 'vue-router';
 import AppIcon from '../components/AppIcon.vue';
 import type { IconName } from '../icons';
@@ -32,14 +34,17 @@ function focusMain() {
       /></RouterLink>
     </header>
     <main id="main-content" tabindex="-1" class="mobile-content">
-      <RouterView :key="route.path" />
+      <IdentityNotice v-if="identityEnabled" /><RouterView :key="route.path" />
     </main>
     <nav class="mobile-bottom-nav" aria-label="移动端主导航">
       <RouterLink
         v-for="tab in tabs"
         :key="tab.key"
         :to="tab.path"
-        :class="{ active: route.meta.mobileTab === tab.key, 'scan-tab': tab.key === 'scan' }"
+        :class="{
+          active: route.meta.mobileTab === tab.key,
+          'scan-tab': tab.key === 'scan',
+        }"
         :aria-current="route.meta.mobileTab === tab.key ? 'page' : undefined"
         ><span><AppIcon :name="tab.icon" :size="22" /></span
         ><small>{{ tab.label }}</small></RouterLink
