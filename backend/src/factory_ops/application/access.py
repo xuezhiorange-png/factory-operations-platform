@@ -82,33 +82,45 @@ class AccessService:
             uow.lock_lifecycle()
             uow.require_csrf(token, csrf)
             actor = self._actor(uow, token)
-            before = uow.person(target)
-            if before is None:
-                raise NotFound
-            if before["version"] != change.expected_version:
-                raise Conflict
-            for factory in change.factory_ids:
-                if not uow.factory_exists(factory):
-                    raise InvalidRequest
-            if (
-                before["role"] == "group_lead"
-                and before["active"]
-                and (change.role != "group_lead" or not change.active)
-                and uow.active_group_count() <= 1
-            ):
-                raise Conflict
-            previous_ids = {factory.id for factory in before["factories"]}
-            if (
-                before["role"] == change.role
-                and before["active"] == change.active
-                and previous_ids == set(change.factory_ids)
-            ):
-                raise Conflict
-            uow.persist_access(target, change)
-            after = uow.person(target)
-            uow.audit_access(actor, target, "access.changed", before, after, change.reason.strip())
-            uow.commit()
-            return {"user": after, "reauthentication_required": actor == target}
+            return self.apply_change(uow, actor, target, change)
+
+    @staticmethod
+    def apply_change(uow: AccessUnitOfWork, actor: UUID, target: UUID, change: AccessChange):
+        """Shared by cookie/CSRF management and explicitly controlled offline management.
+
+        Callers must hold the lifecycle lock and authenticate the actor in this transaction.
+        Recheck the group role here too, so a channel cannot skip the shared authorization.
+        """
+        principal = uow.load_principal(actor)
+        if principal is None or not can_manage_access(principal):
+            raise AccessDenied
+        before = uow.person(target)
+        if before is None:
+            raise NotFound
+        if before["version"] != change.expected_version:
+            raise Conflict
+        for factory in change.factory_ids:
+            if not uow.factory_exists(factory):
+                raise InvalidRequest
+        if (
+            before["role"] == "group_lead"
+            and before["active"]
+            and (change.role != "group_lead" or not change.active)
+            and uow.active_group_count() <= 1
+        ):
+            raise Conflict
+        previous_ids = {factory.id for factory in before["factories"]}
+        if (
+            before["role"] == change.role
+            and before["active"] == change.active
+            and previous_ids == set(change.factory_ids)
+        ):
+            raise Conflict
+        uow.persist_access(target, change)
+        after = uow.person(target)
+        uow.audit_access(actor, target, "access.changed", before, after, change.reason.strip())
+        uow.commit()
+        return {"user": after, "reauthentication_required": actor == target}
 
     def lifecycle(
         self, token: str, csrf: str, target: UUID, expected: int, reason: str, *, unbind=False

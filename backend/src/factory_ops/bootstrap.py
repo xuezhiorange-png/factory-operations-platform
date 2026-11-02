@@ -10,10 +10,13 @@ from factory_ops.api.app import create_app
 from factory_ops.application.access import AccessService
 from factory_ops.application.assets import AssetQueries
 from factory_ops.application.auth import AuthService, AuthSettings
+from factory_ops.application.mcp import ReadOnlyAssetMcp
 from factory_ops.infrastructure.database.access import SqlAccessUnitOfWork
 from factory_ops.infrastructure.database.auth import SqlAuthUnitOfWork
 from factory_ops.infrastructure.database.uow import SqlReadUnitOfWork
+from factory_ops.infrastructure.identity.doubao import DoubaoMcpIdentityProvider
 from factory_ops.infrastructure.identity.feishu import FeishuConfig, FeishuIdentityProvider
+from factory_ops.mcp_config import identity_config, mcp_origin
 
 
 def configured_app():
@@ -38,10 +41,19 @@ def configured_app():
             else None
         )
         auth = AuthService(lambda: SqlAuthUnitOfWork(engine), settings, provider)
+    mcp, mcp_public_origin = None, None
+    if os.environ.get("FACTORY_OPS_MCP_ENABLED") == "1":
+        mcp_public_origin = mcp_origin()
+        mcp = ReadOnlyAssetMcp(
+            DoubaoMcpIdentityProvider(identity_config()),
+            AssetQueries(lambda: SqlReadUnitOfWork(engine)),
+        )
     return create_app(
         lambda: AssetQueries(lambda: SqlReadUnitOfWork(engine)),
         auth_service=auth,
         access_service=AccessService(lambda: SqlAccessUnitOfWork(engine)) if auth else None,
+        mcp_service=mcp,
+        mcp_public_origin=mcp_public_origin,
     )
 
 

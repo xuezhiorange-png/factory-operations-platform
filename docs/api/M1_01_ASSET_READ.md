@@ -1,5 +1,8 @@
 # M1-01 设备只读 HTTP 与 MCP 契约
 
+M1-03A 更新：远程 `/mcp`、第三项 list_factories 和官方 aily JWT 验证见
+[当前 MCP 契约](M1_03A_REMOTE_MCP.md)。本文件保留 M1-01 历史基线及 HTTP 查询规则。
+
 范围：真实 PostgreSQL 查询；仅三条业务 GET。无设备/授权写入、附件端点或正式身份登录。
 运行时 OpenAPI 为 `/openapi.json`，本文件补充鉴权、隔离及错误约定。
 
