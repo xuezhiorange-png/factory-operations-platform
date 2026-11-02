@@ -16,7 +16,7 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -304,7 +304,7 @@ def nginx_metadata(text):
 
 
 def certificate_summary(output, domains, now=None):
-    now = now or datetime.now(UTC)
+    now = now or datetime.now(timezone.utc)
     dates = {}
     for field in ("notBefore", "notAfter"):
         match = re.search(field + r"=(.+)", output)
@@ -312,7 +312,7 @@ def certificate_summary(output, domains, now=None):
             try:
                 dates[field] = datetime.strptime(
                     match[1].strip(), "%b %d %H:%M:%S %Y %Z"
-                ).replace(tzinfo=UTC)
+                ).replace(tzinfo=timezone.utc)
             except ValueError:
                 pass
     sans = re.findall(r"DNS:([^,\s]+)", output)
@@ -691,7 +691,7 @@ class Audit:
         return {
             "schema_version": 1,
             "target": "operator_selected_existing_test_server",
-            "collected_at_utc": datetime.now(UTC).isoformat(),
+            "collected_at_utc": datetime.now(timezone.utc).isoformat(),
             "mode": "READ_ONLY",
             "host_identity_verified_by_collector": False,
             "resources": {

@@ -3,7 +3,7 @@
 import importlib.util
 import json
 import subprocess
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -156,7 +156,7 @@ proxy_set_header Authorization "Bearer SYNTH-PRIVATE-HEADER";
 
 
 def test_certificate_dates_sans_and_expiry_are_metadata_only():
-    now = datetime(2026, 11, 2, tzinfo=UTC)
+    now = datetime(2026, 11, 2, tzinfo=timezone.utc)
     result = audit.certificate_summary(
         "notBefore=Oct  1 00:00:00 2026 GMT\nnotAfter=Dec  1 00:00:00 2026 GMT\n"
         "X509v3 Subject Alternative Name:\n DNS:*.synthetic.example.invalid\n",
