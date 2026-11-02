@@ -68,6 +68,22 @@ def docker_env():
     return env
 
 
+def safe_build_error(value, credentials, private_directory):
+    """Build has no application traffic. Still scrub secrets, opaque tokens and URL credentials.
+
+    Runtime/DB command output is NEVER emitted by this helper. The bounded build excerpt
+    makes registry, builder and context failures diagnosable without publishing private logs.
+    """
+    for credential in credentials:
+        value = value.replace(credential, "[REDACTED]")
+    value = value.replace(str(private_directory), "[PRIVATE_DIRECTORY]")
+    value = re.sub(r"(https?://|postgresql[^:]*://)[^\s/]*@", r"\1[REDACTED]@", value)
+    value = re.sub(r"(https?://[^\s?]+)\?[^\s]+", r"\1?[REDACTED]", value)
+    value = re.sub(r"eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+", "[JWT]", value)
+    value = re.sub(r"[A-Za-z0-9_=-]{40,}", "[OPAQUE_VALUE]", value)
+    return value[-1800:]
+
+
 def run(args, *, timeout=120):
     result = subprocess.run(
         args,
@@ -96,12 +112,21 @@ class Stack:
         self.credentials = []
         self.private_log = directory / "commands.log"
         self.env_file = directory / "compose.env"
+        self.last_operation = "preflight"
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
             self.port = sock.getsockname()[1]
         self.origin = f"https://localhost:{self.port}"
 
     def compose(self, *args, timeout=120, extra_env=None):
+        self.last_operation = next(
+            (
+                a
+                for a in args
+                if a in {"build", "run", "up", "config", "logs", "down", "stop", "ps"}
+            ),
+            "compose",
+        )
         result = subprocess.run(
             [
                 *DOCKER,
@@ -124,6 +149,14 @@ class Stack:
             log.write(result.stdout + result.stderr)
         self.private_log.chmod(0o600)
         if result.returncode:
+            if self.last_operation == "build":
+                print(
+                    "Sanitized build diagnostic:\n"
+                    + safe_build_error(
+                        result.stdout + result.stderr, self.credentials, self.directory
+                    ),
+                    flush=True,
+                )
             raise RuntimeError(
                 "A local compose operation failed; private diagnostics retained"
             )
@@ -827,7 +860,9 @@ def main():
             {
                 "test": "local_stack_acceptance",
                 "status": "FAIL",
-                "evidence": "A check failed; private diagnostics are not uploaded",
+                "evidence": "Operation "
+                + stack.last_operation
+                + " failed; private runtime diagnostics are not uploaded",
             }
         )
         print(

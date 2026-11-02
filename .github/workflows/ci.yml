@@ -138,6 +138,12 @@ jobs:
         run: python -m pip install -e './backend[dev]'
       - name: Check gateway tooling
         run: ruff check scripts/mcp_gateway_test.py deploy/mcp-test
+      - name: Inspect local build prerequisites (no credentials)
+        run: |
+          docker --host=unix:///var/run/docker.sock version --format '{{.Client.Version}} / {{.Server.Version}}'
+          docker --host=unix:///var/run/docker.sock compose version
+          docker --host=unix:///var/run/docker.sock buildx version
+          test -r /etc/ssl/certs/ca-certificates.crt
       - name: Verify local-only TLS, least database privileges and negative cases
         run: python scripts/mcp_gateway_test.py --report .mcp-gateway-test-results/report.json
       - name: Preserve only the sanitized status report
