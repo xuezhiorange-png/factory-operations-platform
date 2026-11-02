@@ -124,3 +124,26 @@ jobs:
           python-version: '3.12'
       - name: Check required artifacts
         run: python scripts/check_docs.py
+
+  mcp-gateway:
+    name: MCP / isolated HTTPS gateway and database roles
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install official MCP client and verification dependencies
+        run: python -m pip install -e './backend[dev]'
+      - name: Check gateway tooling
+        run: ruff check scripts/mcp_gateway_test.py deploy/mcp-test
+      - name: Verify local-only TLS, least database privileges and negative cases
+        run: python scripts/mcp_gateway_test.py --report .mcp-gateway-test-results/report.json
+      - name: Preserve only the sanitized status report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-gateway-status-${{ github.event_name }}
+          path: .mcp-gateway-test-results/report.json
+          retention-days: 7

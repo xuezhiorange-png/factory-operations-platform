@@ -1,7 +1,7 @@
 # 加工厂设备运维管理平台 / Factory Operations Platform
 
-> **M1-03A：远程只读 MCP，Draft 等待审核，未部署。** 从已合并 M1-01/02 的最新 main 开发。
-> aily/飞书真实租户及公网链路均 **UNVERIFIED**；缺配置时认证通道关闭。
+> **M1-03B：独立 HTTPS 联调准备，Draft 等待审核，未公网部署。** 从已合并 PR #8 的 main 开发。
+> 本机合成网关联路26项通过；真实豆包联调缺授权/域名/配置，仍 **BLOCKED / UNVERIFIED**。
 
 ## 已实现范围
 
@@ -20,6 +20,8 @@
 
 ## 交付与契约
 
+- [M1-03B 逐项PASS/FAIL/BLOCKED/UNVERIFIED与证据](docs/delivery/M1_03B_VERIFICATION.md)
+- [部署配置、本机启动、用户需完成的豆包接入操作与回滚](docs/operations/M1_03B_MCP_INTEGRATION.md)、[网关与最小权限ADR](docs/architecture/ADR-0009-isolated-mcp-gateway.md)
 - [M1-03A 隔离验证](docs/delivery/M1_03A_VERIFICATION.md)、[MCP 工具/错误契约](docs/api/M1_03A_REMOTE_MCP.md)
 - [aily 接入配置、离线授权、HTTPS 与回滚方案](docs/operations/M1_03A_MCP_RUNBOOK.md)、[ADR-0008](docs/architecture/ADR-0008-remote-mcp-readonly.md)
 - [M1-02A 认证/会话测试记录](docs/delivery/M1_02A_VERIFICATION.md)、[ADR 与官方资料](docs/architecture/ADR-0006-feishu-platform-sessions.md)
@@ -27,7 +29,7 @@
 - [身份及人员 API](docs/api/M1_02_IDENTITY_ACCESS.md)、[设备 HTTP/MCP 契约](docs/api/M1_01_ASSET_READ.md)
 - [PC/H5 合成环境截图](docs/delivery/screenshots/m1-02/README.md)、[后续实测与豆包任务](docs/delivery/M1_02_NEXT_TASKS.md)
 
-M1-01/02A/02B 的 PR #5/#6/#7 已合并；M1-03A 从 main 创建独立 Draft PR。
+M1-01/02A/02B/03A 的 PR #5/#6/#7/#8 已合并；M1-03B 从 main 创建独立 Draft PR。
 本轮 PR 描述提供准确 HEAD 与实际 Actions 链接，不自行 Ready 或合并。
 历史 [M1-01 验证](docs/delivery/M1_01_VERIFICATION.md)、[M0.5 页面](docs/architecture/FRONTEND_SHELL.md)
 和 [M0.6 冻结预览](docs/delivery/M0_6_PAGES.md) 保留，冻结工作流/源码不修改。

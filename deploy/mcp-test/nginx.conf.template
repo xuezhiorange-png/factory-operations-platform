@@ -1,0 +1,71 @@
+worker_processes 1;
+pid /tmp/nginx.pid;
+# Standard nginx error lines may contain raw URI/headers. Keep only the structured allowlist log.
+error_log /dev/null;
+events { worker_connections 256; }
+http {
+    client_body_temp_path /tmp/client_body;
+    proxy_temp_path /tmp/proxy;
+    fastcgi_temp_path /tmp/fastcgi;
+    uwsgi_temp_path /tmp/uwsgi;
+    scgi_temp_path /tmp/scgi;
+    server_tokens off;
+    log_format safe escape=json '{"time":"$time_iso8601","request_id":"$request_id",'
+                               '"route":"$safe_route","jwt_present":$jwt_present,'
+                               '"status":$status,"seconds":$request_time}';
+    map $uri $safe_route { default blocked; /mcp mcp; }
+    map $http_x_aily_jwt $jwt_present { "" false; default true; }
+    access_log /dev/stdout safe;
+    map $http_host $trusted_host { default 0; "${MCP_PUBLIC_AUTHORITY}" 1; }
+    map $status $retry_after { default ""; 429 "1"; }
+    limit_req_zone $binary_remote_addr zone=per_ip:1m rate=10r/s;
+    limit_conn_zone $binary_remote_addr zone=connections:1m;
+    server {
+        listen 8443 ssl;
+        server_name _;
+        ssl_certificate /run/secrets/tls_certificate;
+        ssl_certificate_key /run/secrets/tls_private_key;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_session_tickets off;
+        client_max_body_size 16k;
+        client_body_timeout 5s;
+        client_header_timeout 5s;
+        keepalive_timeout 5s;
+        large_client_header_buffers 2 8k;
+        add_header Cache-Control no-store always;
+        add_header Referrer-Policy no-referrer always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-Request-ID $request_id always;
+        add_header Retry-After $retry_after always;
+        if ($trusted_host = 0) { return 421; }
+        location = /mcp {
+            if ($args != "") { return 400; }
+            if ($request_method !~ ^(POST|GET|DELETE|HEAD)$) { return 405; }
+            limit_req zone=per_ip burst=20 nodelay;
+            limit_req_status 429;
+            limit_conn connections 8;
+            limit_conn_status 429;
+            error_page 429 = @limited;
+            proxy_http_version 1.1;
+            proxy_pass http://api:8000;
+            proxy_set_header Host ${MCP_PUBLIC_AUTHORITY};
+            proxy_set_header X-Forwarded-Proto https;
+            proxy_set_header X-Forwarded-For $remote_addr;
+            proxy_set_header Forwarded "";
+            proxy_set_header Connection "";
+            proxy_set_header Origin $http_origin;
+            proxy_set_header x-aily-jwt $http_x_aily_jwt;
+            proxy_hide_header Cache-Control;
+            proxy_connect_timeout 3s;
+            proxy_send_timeout 10s;
+            proxy_read_timeout 15s;
+            proxy_buffering off;
+            proxy_request_buffering on;
+        }
+        location @limited {
+            default_type application/json;
+            return 429 '{"error":{"code":"rate_limited"}}';
+        }
+        location / { return 404; }
+    }
+}

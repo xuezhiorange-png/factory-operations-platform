@@ -1,5 +1,8 @@
 # M0 外部系统集成边界（待审计）
 
+M1-03B 增加独立本机 HTTPS 网关与最小 DB 权限配置，复用原 MCP；真实豆包联调仍
+BLOCKED/UNVERIFIED。见 [运行与接入](../operations/M1_03B_MCP_INTEGRATION.md)，没有公网部署。
+
 M1-03A 已增加独立 `/mcp` Streamable HTTP 与 aily HS256 JWT 验签，复用同一内部账号和厂授权。
 接入不要求先启用 Feishu 网页认证；默认关闭，真实租户 **UNVERIFIED**。
 当前实现见 [ADR-0008](ADR-0008-remote-mcp-readonly.md) 和
