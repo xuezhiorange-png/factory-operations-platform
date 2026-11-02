@@ -1,5 +1,11 @@
 # 接口现状与后续目录
 
+## M1-03A：远程只读 MCP
+
+独立 `/mcp`、三个工具、aily HS256 身份与同库厂授权见
+[MCP 契约](M1_03A_REMOTE_MCP.md)。默认关闭，真实租户/公网 **UNVERIFIED**。
+保留下述 HTTP 和 Feishu 会话接口，未新增业务写接口。
+
 ## M1-01 已实现：工厂范围内的设备只读查询
 
 已实现 `GET /api/v1/factories`、`GET /api/v1/factories/{factory_id}/assets`、

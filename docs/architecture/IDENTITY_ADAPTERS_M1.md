@@ -1,5 +1,14 @@
 # M1 身份适配：平台会话、飞书与豆包
 
+## M1-03A 更新
+
+远程 `/mcp` 与官方 aily HS256 请求身份已实现，独立于 Feishu 网页会话，默认关闭。
+使用官方 x-aily-jwt / tenant_id / user_id / agent_id / exp，不要求不存在的 issuer/audience。
+本地 issuer 字段仅作固定来源命名空间；内部用户和厂授权仍每次从数据库读取。
+三个只读工具、离线受控绑定和合成 HTTPS 验证见
+[ADR-0008](ADR-0008-remote-mcp-readonly.md)、[当前契约](../api/M1_03A_REMOTE_MCP.md)。
+真实平台联调仍 **UNVERIFIED**。以下各阶段说明是历史基线，现状以本节链接为准。
+
 ## M1-02A 更新
 
 FeishuIdentityProvider 已实现官方授权码交换与用户信息校验，配置完整才启用；

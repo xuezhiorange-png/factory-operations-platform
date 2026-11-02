@@ -30,8 +30,10 @@ def test_unconfigured_identity_channels_never_claim_success(provider):
         provider().authenticate("unsigned.synthetic.claims")
 
 
-def test_only_two_read_tools_and_no_client_user_identity_in_contract():
-    assert {tool["name"] for tool in TOOLS} == {"search_assets", "get_asset_detail"}
+def test_only_three_read_tools_and_no_client_user_identity_in_contract():
+    assert {tool["name"] for tool in TOOLS} == {
+        "list_factories", "search_assets", "get_asset_detail"
+    }
     assert all(
         tool["annotations"]["readOnlyHint"] and not tool["inputSchema"]["additionalProperties"]
         for tool in TOOLS

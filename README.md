@@ -1,7 +1,7 @@
 # 加工厂设备运维管理平台 / Factory Operations Platform
 
-> **M1-02：身份与人员授权，Draft 等待审核，未部署。** 已有设备只读台账、PC/H5 页面与独立数据库。
-> 飞书真实租户认证、人员事件及实际手机容器均 **UNVERIFIED**；缺配置时认证通道关闭。
+> **M1-03A：远程只读 MCP，Draft 等待审核，未部署。** 从已合并 M1-01/02 的最新 main 开发。
+> aily/飞书真实租户及公网链路均 **UNVERIFIED**；缺配置时认证通道关闭。
 
 ## 已实现范围
 
@@ -11,19 +11,24 @@
 - 现有设置页面的人员管理：绑定状态、角色、工厂、启用/停用、撤会话、飞书解绑与变更记录。
   数据库限制管理员至多一厂；权限变化撤销旧会话，重新启用不恢复旧会话；审计与变更同事务。
 - 工厂列表、厂内设备列表/搜索和详情，PC/H5 共用真实只读 API。其余运维业务仍待接入。
-- 豆包只保留两个只读 MCP 契约，身份适配器仍失败关闭，无网络监听或写工具。
+- 独立 `/mcp` Streamable HTTP，三个只读工具 list_factories / search_assets / get_asset_detail，
+  复用 AssetQueries 与厂权限/审计。每请求验证 aily HS256 JWT，无需先飞书网页登录。
+  未绑定/未授权拒绝查询；离线受控绑定、首位初始化和后续授权复用内部 users 与既有 IAM 约束。
 
 没有部署、真实员工/设备导入、通讯录同步、监控/PLC 操作、巡检/维修/保养/库存或复杂审批。
 飞书和豆包是接入渠道，设备与授权事实始终保存在独立运维数据库。
 
 ## 交付与契约
 
+- [M1-03A 隔离验证](docs/delivery/M1_03A_VERIFICATION.md)、[MCP 工具/错误契约](docs/api/M1_03A_REMOTE_MCP.md)
+- [aily 接入配置、离线授权、HTTPS 与回滚方案](docs/operations/M1_03A_MCP_RUNBOOK.md)、[ADR-0008](docs/architecture/ADR-0008-remote-mcp-readonly.md)
 - [M1-02A 认证/会话测试记录](docs/delivery/M1_02A_VERIFICATION.md)、[ADR 与官方资料](docs/architecture/ADR-0006-feishu-platform-sessions.md)
 - [M1-02B 人员授权/生命周期记录](docs/delivery/M1_02B_VERIFICATION.md)、[数据库/并发与回滚决策](docs/architecture/ADR-0007-access-lifecycle.md)
 - [身份及人员 API](docs/api/M1_02_IDENTITY_ACCESS.md)、[设备 HTTP/MCP 契约](docs/api/M1_01_ASSET_READ.md)
 - [PC/H5 合成环境截图](docs/delivery/screenshots/m1-02/README.md)、[后续实测与豆包任务](docs/delivery/M1_02_NEXT_TASKS.md)
 
-A 依赖未合并的 PR #5，B 依赖 A。各 PR 描述提供准确 HEAD 与实际 Actions 链接；均保持 Draft。
+M1-01/02A/02B 的 PR #5/#6/#7 已合并；M1-03A 从 main 创建独立 Draft PR。
+本轮 PR 描述提供准确 HEAD 与实际 Actions 链接，不自行 Ready 或合并。
 历史 [M1-01 验证](docs/delivery/M1_01_VERIFICATION.md)、[M0.5 页面](docs/architecture/FRONTEND_SHELL.md)
 和 [M0.6 冻结预览](docs/delivery/M0_6_PAGES.md) 保留，冻结工作流/源码不修改。
 

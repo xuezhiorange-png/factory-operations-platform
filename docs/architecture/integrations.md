@@ -1,5 +1,11 @@
 # M0 外部系统集成边界（待审计）
 
+M1-03A 已增加独立 `/mcp` Streamable HTTP 与 aily HS256 JWT 验签，复用同一内部账号和厂授权。
+接入不要求先启用 Feishu 网页认证；默认关闭，真实租户 **UNVERIFIED**。
+当前实现见 [ADR-0008](ADR-0008-remote-mcp-readonly.md) 和
+[接入说明](../operations/M1_03A_MCP_RUNBOOK.md)。不连接已有冷库或规划 MCP，以下监控边界保持不变。
+后续各阶段描述仅代表当时交付状态。
+
 M1-01 新增独立 `FeishuIdentityProvider` / `DoubaoMcpIdentityProvider` 与共用应用服务的
 两个只读 MCP 工具契约，实际 provider 均失败关闭；未连接任何正式外部系统。
 当前身份信任与 `x-aily-jwt` 官方校验待办见 [身份适配设计](IDENTITY_ADAPTERS_M1.md)，

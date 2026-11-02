@@ -4,6 +4,7 @@ from collections.abc import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
+from test_doubao_jwt import jwt_identity as signed_identity  # noqa: F401
 
 from factory_ops.api.app import create_app
 

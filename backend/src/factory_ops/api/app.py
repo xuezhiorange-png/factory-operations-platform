@@ -7,15 +7,18 @@ from fastapi import FastAPI, Request
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.routing import Route
 
 from factory_ops.api.access import router as access_router
 from factory_ops.api.assets import router as assets_router
 from factory_ops.api.auth import router as auth_router
 from factory_ops.api.health import router as health_router
+from factory_ops.api.mcp import remote_mcp
 from factory_ops.application.access import AccessService
 from factory_ops.application.assets import AssetQueries
 from factory_ops.application.auth import AuthService
 from factory_ops.application.errors import ApplicationError
+from factory_ops.application.mcp import ReadOnlyAssetMcp
 
 
 def create_app(
@@ -24,8 +27,12 @@ def create_app(
     data_source: Literal["configured_database", "synthetic_test"] = "configured_database",
     auth_service: AuthService | None = None,
     access_service: AccessService | None = None,
+    mcp_service: ReadOnlyAssetMcp | None = None,
+    mcp_public_origin: str | None = None,
 ) -> FastAPI:
+    mcp_endpoint, mcp_lifespan = remote_mcp(mcp_service, mcp_public_origin)
     app = FastAPI(
+        lifespan=mcp_lifespan,
         title="Factory Operations Platform",
         version="0.2.0",
         description="M1-01: authenticated factory-scoped asset reads; no business write APIs.",
@@ -71,6 +78,7 @@ def create_app(
     app.include_router(assets_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(access_router, prefix="/api/v1")
+    app.router.routes.append(Route("/mcp", mcp_endpoint, methods=["POST", "GET", "DELETE"]))
     return app
 
 
