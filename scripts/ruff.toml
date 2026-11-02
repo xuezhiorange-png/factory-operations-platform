@@ -1,0 +1,5 @@
+# Keep the standalone audit compatible with Python 3.10; other scripts retain
+# Ruff's default target. In particular, never upgrade timezone.utc to datetime.UTC.
+[per-file-target-version]
+"audit_existing_server.py" = "py310"
+"tests/test_audit_*.py" = "py310"

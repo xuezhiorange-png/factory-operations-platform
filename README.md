@@ -20,6 +20,7 @@
 
 ## 交付与契约
 
+- [现有服务器只读审计状态](docs/delivery/EXISTING_SERVER_AUDIT.md)、[Mac/控制台只读命令](docs/operations/EXISTING_SERVER_READONLY_AUDIT.md)、[待审计隔离方案](docs/proposals/EXISTING_SERVER_ISOLATION_PLAN.md)：当前SSH出站BLOCKED，READY_FOR_DEPLOYMENT=NO。
 - [M1-03B 逐项PASS/FAIL/BLOCKED/UNVERIFIED与证据](docs/delivery/M1_03B_VERIFICATION.md)
 - [部署配置、本机启动、用户需完成的豆包接入操作与回滚](docs/operations/M1_03B_MCP_INTEGRATION.md)、[网关与最小权限ADR](docs/architecture/ADR-0009-isolated-mcp-gateway.md)
 - [M1-03A 隔离验证](docs/delivery/M1_03A_VERIFICATION.md)、[MCP 工具/错误契约](docs/api/M1_03A_REMOTE_MCP.md)

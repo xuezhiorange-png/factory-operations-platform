@@ -35,5 +35,9 @@ testpaths = ["tests"]
 line-length = 100
 target-version = "py312"
 
+[tool.ruff.per-file-target-version]
+# Standalone audit tests also run without backend dependencies on Python 3.10/3.11.
+"tests/test_server_audit_tooling.py" = "py310"
+
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
