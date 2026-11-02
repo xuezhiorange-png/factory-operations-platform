@@ -46,6 +46,7 @@ jobs:
           python -m pytest --noconftest -q
           backend/tests/test_server_audit_tooling.py
           scripts/tests/test_audit_compatibility.py
+          scripts/tests/test_audit_runbook.py
 
   backend:
     name: Backend / tests and lint

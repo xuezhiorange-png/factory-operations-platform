@@ -2,4 +2,4 @@
 # Ruff's default target. In particular, never upgrade timezone.utc to datetime.UTC.
 [per-file-target-version]
 "audit_existing_server.py" = "py310"
-"tests/test_audit_compatibility.py" = "py310"
+"tests/test_audit_*.py" = "py310"

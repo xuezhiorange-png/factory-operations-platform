@@ -1,9 +1,11 @@
 # 现有服务器审计：网络阻塞与交付状态
 
 TASK_ID：FACTORY_OPS_M1_03B_EXISTING_SERVER_AUDIT。
+最终修复：FACTORY_OPS_M1_03B_SERVER_AUDIT_FINAL_FIX，继续原 Draft PR #10。
 基线 main `85c7d18ba44148e1a7133c08525cc2a2421200e6`，PR #9 已合并。
 分支 `codex/m1-03b-existing-server-audit`；独立 Draft PR，最终HEAD/CI见PR描述。
-公开记录使用“目标测试服务器”代号，实际地址由任务指定，不在Public仓库补充发布服务器身份或域名。
+公开审计结果使用“目标测试服务器”代号；按最终修复的明确要求，仅现场操作命令列出任务指定IP，
+不披露真实域名、员工身份或凭据。
 
 ## 实际执行与网络证据
 
@@ -57,7 +59,13 @@ PR #9通过的26项网关检查仍只证明本机合成环境，不证明本服�
 
 离线测试覆盖禁止命令、固定Docker端点、错误输出隐藏、密钥/.env/软链接拒读、IPv4/IPv6/UDP端口解析、
 CIDR与上级路由冲突、缺数据不能判安全、Nginx/URI/域名脱敏、证书日期/SAN及既有资源保护。
-本地22项通过；后续完整CI结果在Draft PR记录，不把工具测试PASS写成SERVER_AUDIT=PASS。
+原有22项合成测试继续保留。最终修复将datetime.UTC替换为timezone.utc，逐项检查全部stdlib导入、
+语法与API，未发现其他Python 3.11+专有依赖；独立CI矩阵使用setup-python实际安装3.10/3.11/3.12，
+检查真实解释器版本，运行22项原测试及时间处理、全合成采集、stdin与Mac命令测试，不安装要求3.12的后端包。
+Ruff对独立审计及其测试固定py310目标，防止自动改回datetime.UTC。
+本地Python3.10.22/3.11.17/3.12.14已实际执行兼容性测试；最终数量、完整回归和CI链接见PR描述。
+Mac命令在本地以合成下载/SSH替身验证成功、BLOCKED和非JSON失败路径，未调用真实SSH。
+CI与工具测试PASS不写成SERVER_AUDIT=PASS；本轮没有再次尝试目标SSH连接。
 
 取得目标上的脱敏审计JSON后，先复核主机、服务归属、完整Nginx结构、证书、端口/网络与资源余量，
 再评审下一阶段变更。审计未完成和授权未满足前，READY_FOR_DEPLOYMENT始终NO。
