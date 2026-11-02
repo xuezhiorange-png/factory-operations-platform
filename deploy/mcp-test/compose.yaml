@@ -1,0 +1,173 @@
+# SYNTHETIC ISOLATED TEST ONLY. No public binding, Feishu tenant, or production database.
+x-app: &app
+  image: ${MCP_TEST_IMAGE:-factory-ops-mcp-test:local}
+  build:
+    context: ../..
+    dockerfile: deploy/mcp-test/Dockerfile
+    secrets: [build_ca]
+  read_only: true
+  tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 100
+  mem_limit: 384m
+  cpus: 1
+  labels:
+    factory_ops.task: FACTORY_OPS_M1_03B_MCP_LIVE_INTEGRATION
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: factory_ops_mcp_synthetic
+      POSTGRES_USER: factory_ops_bootstrap
+      POSTGRES_PASSWORD_FILE: /run/secrets/bootstrap_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    secrets: [bootstrap_password, runtime_password, migrator_password, operator_password]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/10-mcp-roles.sh:ro
+    command:
+      - postgres
+      - -c
+      - log_statement=none
+      - -c
+      - log_min_error_statement=panic
+      - -c
+      - log_parameter_max_length=0
+      - -c
+      - log_parameter_max_length_on_error=0
+      - -c
+      - log_error_verbosity=terse
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -h 127.0.0.1 -U factory_ops_bootstrap -d factory_ops_mcp_synthetic]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks: [database]
+    labels:
+      factory_ops.task: FACTORY_OPS_M1_03B_MCP_LIVE_INTEGRATION
+    # Deliberately NO ports, network_mode:host or production/external volumes.
+
+  api:
+    <<: *app
+    environment:
+      MCP_DB_ROLE: runtime
+    secrets: [runtime_password, aily_signing_key, identity_settings]
+    depends_on:
+      db: {condition: service_healthy}
+    command:
+      - uvicorn
+      - factory_ops.bootstrap:app
+      - --host=0.0.0.0
+      - --port=8000
+      - --proxy-headers
+      - --forwarded-allow-ips=172.30.83.2
+      - --no-access-log
+      - --log-level=warning
+      - --limit-concurrency=32
+      - --timeout-keep-alive=5
+    networks:
+      gateway: {ipv4_address: 172.30.83.3}
+      database: {}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health',timeout=2).close()"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  proxy:
+    image: nginx:1.28-alpine
+    user: '101:101'
+    entrypoint: [sh, -c]
+    command: ['envsubst ''$${MCP_PUBLIC_AUTHORITY}'' < /etc/nginx/mcp.conf.template > /tmp/nginx.conf; exec nginx -c /tmp/nginx.conf -g "daemon off;"']
+    environment:
+      MCP_PUBLIC_AUTHORITY: ${MCP_PUBLIC_AUTHORITY:?Set exact authority matching the configured HTTPS origin}
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/mcp.conf.template:ro
+    secrets: [tls_certificate, tls_private_key]
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 1
+    ports:
+      - '127.0.0.1:${MCP_HTTPS_PORT}:8443'
+    depends_on:
+      api: {condition: service_healthy}
+    networks:
+      gateway: {ipv4_address: 172.30.83.2}
+      ingress: {}
+    labels:
+      factory_ops.task: FACTORY_OPS_M1_03B_MCP_LIVE_INTEGRATION
+
+  migrate:
+    <<: *app
+    profiles: [operator]
+    environment: {MCP_DB_ROLE: migrator}
+    secrets: [migrator_password]
+    networks: [database]
+    command: [python, /app/mcp-test/database.py, migrate]
+
+  read-check:
+    <<: *app
+    profiles: [operator]
+    environment: {MCP_DB_ROLE: runtime}
+    secrets: [runtime_password, aily_signing_key, identity_settings]
+    networks: [database]
+    command: [python, /app/mcp-test/database.py, privileges]
+
+  operator:
+    <<: *app
+    profiles: [operator]
+    user: '${MCP_OPERATOR_UID:?Set the credential file owner UID}:${MCP_OPERATOR_GID:?Set the credential file owner GID}'
+    environment:
+      MCP_DB_ROLE: operator
+      FACTORY_OPS_ALLOW_OFFLINE_BOOTSTRAP: '1'
+    secrets: [operator_password, aily_signing_key, identity_settings]
+    volumes:
+      - ${MCP_PRIVATE_DIR:?Private directory outside checkout}/identities:/run/identities:ro
+    networks: [database]
+    command: [python, -m, factory_ops.bootstrap_mcp_access, --help]
+
+  probe:
+    <<: *app
+    profiles: [operator]
+    user: '${MCP_OPERATOR_UID}:${MCP_OPERATOR_GID}'
+    environment: {MCP_DB_ROLE: probe}
+    volumes:
+      - ${MCP_PRIVATE_DIR}/identities:/run/identities:ro
+    networks: [gateway]
+    command: [python, /app/mcp-test/database.py, untrusted-proxy]
+
+networks:
+  ingress: {}
+  gateway:
+    internal: true
+    ipam:
+      config: [{subnet: 172.30.83.0/28}]
+  database:
+    internal: true
+volumes:
+  pgdata: {}
+secrets:
+  build_ca:
+    file: ${MCP_BUILD_CA_FILE:?Use the trusted system/session CA bundle for the build}
+  bootstrap_password:
+    file: ${MCP_PRIVATE_DIR}/bootstrap_password
+  runtime_password:
+    file: ${MCP_PRIVATE_DIR}/runtime_password
+  migrator_password:
+    file: ${MCP_PRIVATE_DIR}/migrator_password
+  operator_password:
+    file: ${MCP_PRIVATE_DIR}/operator_password
+  aily_signing_key:
+    file: ${MCP_PRIVATE_DIR}/aily_signing_key
+  identity_settings:
+    file: ${MCP_PRIVATE_DIR}/identity_settings.json
+  tls_certificate:
+    file: ${MCP_PRIVATE_DIR}/localhost.crt
+  tls_private_key:
+    file: ${MCP_PRIVATE_DIR}/localhost.key

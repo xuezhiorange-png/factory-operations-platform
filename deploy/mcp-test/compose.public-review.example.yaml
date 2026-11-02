@@ -1,0 +1,9 @@
+# TEMPLATE ONLY. Never used by CI or the local verification script.
+# Setting variables is NOT authorization. Requires explicit approval, a dedicated host/IP,
+# an isolated domain/trusted certificate, synthetic test accounts and controlled secrets.
+services:
+  proxy:
+    ports: !override
+      - '${MCP_APPROVED_PUBLIC_IP:?Explicit authorization and a dedicated IP required}:443:8443'
+    labels:
+      factory_ops.public_test_approval: ${MCP_PUBLIC_TEST_APPROVAL_REFERENCE:?Approval reference required}
