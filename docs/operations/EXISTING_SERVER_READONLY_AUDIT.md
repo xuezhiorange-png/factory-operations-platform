@@ -9,7 +9,8 @@ Codex 当前没有可用 SSH 出站通道，已经停止远程尝试；目标服
 
 先在本机取得本 Draft PR 的 [审计脚本](../../scripts/audit_existing_server.py)。
 目标地址使用任务指定值，现有私钥仅保留在自己的 Mac，不上传到聊天、GitHub或Codex。
-已在 SSH agent/config 中配置身份时可省略 `-i`，不生成新密钥。
+推荐用 `-i` 明确选择已有授权身份；只有现有SSH配置已明确选择同一IdentityFile时才按该配置省略它。
+仅在agent中加载但未配置的自定义身份，不能配合IdentitiesOnly=yes盲目省略 `-i`。不生成新密钥。
 
 ```bash
 umask 077
@@ -18,6 +19,7 @@ AUTHORIZED_SSH_KEY="$HOME/.ssh/填写已有授权私钥文件名"
 AUDIT_OUTPUT="$HOME/factory-ops-server-audit.json"
 
 ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes \
+  -o UpdateHostKeys=no \
   -o ConnectTimeout=8 -o ConnectionAttempts=1 -o IdentitiesOnly=yes \
   -i "$AUTHORIZED_SSH_KEY" "ops@$AUDIT_HOST" \
   'PYTHONDONTWRITEBYTECODE=1 python3 - --collect' \
