@@ -57,8 +57,10 @@ Python3.12 / Docker28 / Compose2.40 / PostgreSQL17 / Nginx1.28 / 官方 MCP SDK2
 python scripts/check_docs.py
 ```
 
-Ruff、Actions actionlint、diff/文档本地链接在交付前检查。GitHub Actions 增加独立 MCP gateway job
-重复上述26项，保留原后端165项与 PC/H5 90项及三种构建；远程结果以最终 HEAD 的实际检查记录为准。
+Ruff、Actions actionlint、diff/文档本地链接在交付前检查。额外本机回归为后端165 PASS（0 skipped），
+PC/H5 73+6+11=90 PASS，三种构建/类型检查 PASS；新增构建日志脱敏单测 PASS，后端现共166项。
+GitHub Actions 增加独立 MCP gateway job 重复上述26项，并保留后端/PC/H5及构建；
+远程结果以最终 HEAD 的实际检查记录为准。
 CI只上传脱敏状态JSON，不上传容器/命令日志、JWT、secret目录、私钥或认证浏览器trace。
 
 ## 阶段二真实豆包状态
@@ -84,6 +86,8 @@ CI只上传脱敏状态JSON，不上传容器/命令日志、JWT、secret目录�
 - 新增 deploy/mcp-test 的 Dockerfile、构建过滤、Compose、本机/公开评审模板、Nginx、DB初始化、
   文件secret启动器、隔离数据库工具与操作员诊断。
 - 新增 scripts/mcp_gateway_test.py；CI新增独立本机网关验证，忽略本地输出并只上传状态JSON。
+- [构建错误脱敏单测](../../backend/tests/test_gateway_tooling.py)覆盖动态JWT、签名密钥、URL凭据和私有路径；
+  仅构建失败时输出有界脱敏摘要，运行时/数据库原始诊断不输出。
 - README、文档索引/check_docs、ADR-0009、本运行/交付记录补充入口。
 - **新增业务数据库迁移：无。** 使用既有 0003_access_lifecycle；新数据库部署角色/GRANT不用于现有数据库。
 - backend/src、现有 MCP/Feishu/权限/应用服务、frontend 与冻结文件均未修改。

@@ -78,6 +78,7 @@ REQUIRED = [
     "deploy/mcp-test/database.py",
     "deploy/mcp-test/inspect_identity.py",
     "scripts/mcp_gateway_test.py",
+    "backend/tests/test_gateway_tooling.py",
     "docs/architecture/ADR-0009-isolated-mcp-gateway.md",
     "docs/operations/M1_03B_MCP_INTEGRATION.md",
     "docs/delivery/M1_03B_VERIFICATION.md",

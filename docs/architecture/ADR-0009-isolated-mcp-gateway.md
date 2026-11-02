@@ -54,6 +54,7 @@ API 没有迁移或操作员凭据，也没有离线初始化开关。操作员�
 镜像以 UID10001 运行 API，Nginx UID101；只读 rootfs、drop ALL capabilities、no-new-privileges、
 有界 tmpfs。文件 secret 按服务分别只读挂载，不进入镜像或 Docker Config.Env；只有 CA 以 build secret
 供 pip 使用，不关闭 TLS 校验。具体本地文件权限取舍见运行说明。
+Compose5/Bake 兼容处理仅将公开CA临时复制到已忽略的工作区目录，随后仍以 secret 挂载；不放宽全盘读取权限。
 
 网关访问日志固定为 time / request_id / route（mcp 或 blocked）/ jwt_present（布尔）/ status / seconds。
 不记录 URI query、请求体、Header 值、IP、员工标识、签名密钥和 JWT；拒绝带 query 的 MCP 请求。

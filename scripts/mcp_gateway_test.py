@@ -112,6 +112,7 @@ class Stack:
         self.credentials = []
         self.private_log = directory / "commands.log"
         self.env_file = directory / "compose.env"
+        self.build_ca = ROOT / ".mcp-gateway-test-results" / (self.project + ".crt")
         self.last_operation = "preflight"
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
@@ -141,6 +142,7 @@ class Stack:
             ],
             check=False,
             env={**docker_env(), **(extra_env or {})},
+            cwd=ROOT,
             capture_output=True,
             text=True,
             timeout=timeout,
@@ -164,6 +166,10 @@ class Stack:
 
     def prepare(self):
         self.directory.chmod(0o700)
+        # Compose5/Bake permits file reads inside cwd without extra fs entitlements. This is
+        # a PUBLIC trust bundle only; runtime secrets/JWT/private keys remain outside checkout.
+        self.build_ca.parent.mkdir(mode=0o700, exist_ok=True)
+        shutil.copyfile("/etc/ssl/certs/ca-certificates.crt", self.build_ca)
         identities = self.directory / "identities"
         identities.mkdir(mode=0o700)
         for name in (
@@ -228,7 +234,7 @@ class Stack:
                     f"MCP_PUBLIC_AUTHORITY=localhost:{self.port}",
                     f"MCP_OPERATOR_UID={os.getuid()}",
                     f"MCP_OPERATOR_GID={os.getgid()}",
-                    "MCP_BUILD_CA_FILE=/etc/ssl/certs/ca-certificates.crt",
+                    f"MCP_BUILD_CA_FILE={self.build_ca}",
                 ]
             )
             + "\n"
@@ -892,6 +898,7 @@ def main():
                 for path in directory.rglob("*"):
                     if path.is_file() and path.name != "commands.log":
                         path.unlink()
+            stack.build_ca.unlink(missing_ok=True)
             args.report.parent.mkdir(parents=True, exist_ok=True)
             args.report.write_text(
                 json.dumps(result, ensure_ascii=False, indent=2) + "\n"
