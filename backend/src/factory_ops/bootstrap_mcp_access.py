@@ -50,6 +50,11 @@ def main():
     )
     parser.add_argument("--factory", type=UUID, action="append", default=[])
     parser.add_argument("--disable", action="store_true")
+    parser.add_argument(
+        "--confirm-initial-lead-link",
+        action="store_true",
+        help="Operator-approved one-time link to an existing active group lead",
+    )
     parser.add_argument("--confirm-offline-change", required=True, action="store_true")
     args = parser.parse_args()
     if os.environ.get("FACTORY_OPS_ALLOW_OFFLINE_BOOTSTRAP") != "1":
@@ -72,6 +77,8 @@ def main():
             raise ValueError
         if args.operation == "grant" and args.role is None:
             raise ValueError
+        if args.confirm_initial_lead_link and args.operation != "bind":
+            raise ValueError
         engine = create_engine(url, echo=False)
         service = McpAccessService(lambda: SqlMcpAccessUnitOfWork(engine))
         if args.operation == "bind":
@@ -81,6 +88,7 @@ def main():
                 actor_identity=actor,
                 target=args.target,
                 expected=args.expected_version,
+                initial_lead_link=args.confirm_initial_lead_link,
             )
         elif args.operation == "bootstrap":
             result = service.bootstrap(identity, args.expected_version, args.reason)

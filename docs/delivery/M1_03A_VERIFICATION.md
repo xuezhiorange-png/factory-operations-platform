@@ -15,7 +15,7 @@ HTTPS 用临时自签 localhost 证书，官方 MCP 客户端显式信任测试 
 
 | 验证 | 结果 |
 |---|---|
-| 后端 pytest（原115 + 新48） | 163 passed，0 skipped，11.88秒 |
+| 后端 pytest（原115 + 新50） | 165 passed，0 skipped，11.98秒 |
 | Ruff / 文档本地链接 / CI actionlint / git diff --check | 全部通过；106必需文件、133本地链接 |
 | PC/H5 shell、设备 API、Feishu/IAM 浏览器回归 | 73 + 6 + 11 = 90 passed（32.9 / 7.1 / 14.8秒） |
 | 默认/设备/身份三种前端构建（均含类型检查） | 全部通过 |
@@ -55,6 +55,7 @@ test:business；再启用 VITE_IDENTITY_ENABLED=true 构建到 dist-identity 后
 | 未知方法 / 未知工具 / 非法 UUID / 额外 user_id | -32601 / invalid_request；不回显输入敏感哨兵 |
 | 错 Origin / 错 Host / 过大 body / 独立 GET | 403 / 421 / 413 / 405 |
 | 首位负责人并发初始化 | 仅1个成功，另1个冲突；仅1名集团负责人 |
+| 已有 Feishu-only 负责人首次 MCP 关联 | 显式离线确认、目标既有集团角色与版本匹配；禁止升角色，并发只绑定1项 |
 | 绑定审计失败 | users 与 external_identities 同事务回滚，均无残留 |
 | 既有迁移/失败回滚/审计不可变/CSRF/版本并发 | 原有后端用例全量回归通过 |
 

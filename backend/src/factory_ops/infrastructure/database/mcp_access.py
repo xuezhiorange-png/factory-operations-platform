@@ -8,6 +8,22 @@ from factory_ops.infrastructure.database.models import AuditRow, ExternalIdentit
 
 
 class SqlMcpAccessUnitOfWork(SqlAccessUnitOfWork):
+    def has_active_mcp_lead(self):
+        return (
+            self.session.scalar(
+                select(ExternalIdentityRow.id)
+                .join(UserRow)
+                .where(
+                    ExternalIdentityRow.provider == "doubao_mcp",
+                    ExternalIdentityRow.active.is_(True),
+                    UserRow.active.is_(True),
+                    UserRow.role == "group_lead",
+                )
+                .limit(1)
+            )
+            is not None
+        )
+
     def bind_mcp(self, identity, target, expected):
         binding = self.session.scalar(
             select(ExternalIdentityRow).where(

@@ -196,6 +196,97 @@ def test_bind_and_audit_rollback_together(controlled):
         assert session.scalar(select(func.count()).select_from(ExternalIdentityRow)) == 0
 
 
+def test_existing_feishu_only_lead_can_be_linked_by_explicit_offline_operator(
+    business, signed_identity
+):
+    _, data, db = business
+    provider, token, _ = signed_identity
+    service = McpAccessService(lambda: SqlMcpAccessUnitOfWork(db.engine))
+    identity = provider.authenticate(token())
+    with SqlMcpAccessUnitOfWork(db.engine) as uow:
+        lead = uow.person(data.users["group"])
+        engineer = uow.person(data.users["engineer"])
+    with pytest.raises(AccessDenied):
+        service.bind(
+            identity, "SYNTH-没有显式离线确认", target=lead["id"], expected=lead["version"]
+        )
+    with pytest.raises(Conflict):
+        service.bind(
+            identity,
+            "SYNTH-禁止借关联提升工程师",
+            target=engineer["id"],
+            expected=engineer["version"],
+            initial_lead_link=True,
+        )
+    linked = service.bind(
+        identity,
+        "SYNTH-人工核对已有负责人关联审批",
+        target=lead["id"],
+        expected=lead["version"],
+        initial_lead_link=True,
+    )
+    assert linked["role"] == "group_lead" and linked["version"] > lead["version"]
+    with SqlMcpAccessUnitOfWork(db.engine) as uow:
+        assert uow.resolve_identity(identity) == lead["id"]
+    another = provider.authenticate(token(user_id=7620000000000000099))
+    with pytest.raises(Conflict):
+        service.bind(
+            another,
+            "SYNTH-已有MCP负责人则关闭初始化例外",
+            target=lead["id"],
+            expected=linked["version"],
+            initial_lead_link=True,
+        )
+    with Session(db.engine) as session:
+        assert (
+            session.scalar(
+                select(func.count())
+                .select_from(AuditRow)
+                .where(AuditRow.action == "access.mcp_initial_lead_link")
+            )
+            == 1
+        )
+
+
+def test_initial_existing_lead_link_concurrency_allows_one_binding(business, signed_identity):
+    _, data, db = business
+    provider, token, _ = signed_identity
+    service = McpAccessService(lambda: SqlMcpAccessUnitOfWork(db.engine))
+    identities = [provider.authenticate(token(user_id=7620000000000000001 + i)) for i in range(2)]
+    with SqlMcpAccessUnitOfWork(db.engine) as uow:
+        lead = uow.person(data.users["group"])
+    barrier = Barrier(2)
+
+    def bind(index):
+        barrier.wait(timeout=5)
+        try:
+            service.bind(
+                identities[index],
+                "SYNTH-并发初始化关联",
+                target=lead["id"],
+                expected=lead["version"],
+                initial_lead_link=True,
+            )
+            return True
+        except Conflict:
+            return False
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        assert sorted(pool.map(bind, range(2))) == [False, True]
+    with Session(db.engine) as session:
+        assert (
+            session.scalar(
+                select(func.count())
+                .select_from(ExternalIdentityRow)
+                .where(
+                    ExternalIdentityRow.user_id == lead["id"],
+                    ExternalIdentityRow.provider == "doubao_mcp",
+                )
+            )
+            == 1
+        )
+
+
 def test_private_credential_file_and_operator_flag(tmp_path, monkeypatch):
     import sys
 

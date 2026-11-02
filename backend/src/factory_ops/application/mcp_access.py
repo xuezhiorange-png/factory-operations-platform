@@ -13,6 +13,7 @@ class McpAccessUnitOfWork(AccessUnitOfWork, Protocol):
     def bind_mcp(self, identity: ExternalIdentity, target: UUID | None, expected: int | None): ...
     def unbind_mcp(self, target: UUID): ...
     def audit_mcp_binding(self, actor: UUID, target: UUID, binding: UUID, reason: str): ...
+    def has_active_mcp_lead(self) -> bool: ...
 
 
 class McpAccessService:
@@ -34,7 +35,16 @@ class McpAccessService:
         if not isinstance(reason, str) or not 2 <= len(reason.strip()) <= 300:
             raise InvalidRequest
 
-    def bind(self, identity, reason, *, actor_identity=None, target=None, expected=None):
+    def bind(
+        self,
+        identity,
+        reason,
+        *,
+        actor_identity=None,
+        target=None,
+        expected=None,
+        initial_lead_link=False,
+    ):
         self._reason(reason)
         if not isinstance(identity, ExternalIdentity) or identity.provider != "doubao_mcp":
             raise InvalidRequest
@@ -43,14 +53,34 @@ class McpAccessService:
             # Before a first lead exists, the privileged operator may enroll ONLY a new pending
             # account. Existing users cannot be taken over by this initialization exception.
             if actor_identity is None:
-                if uow.active_group_count() or target is not None:
-                    raise AccessDenied
-                actor = None
+                if initial_lead_link:
+                    # Explicit offline operator recovery of an EXISTING lead, never anonymous
+                    # enrollment or promotion. Required when migrating from Feishu-only IAM.
+                    before = uow.person(target) if target else None
+                    if (
+                        uow.has_active_mcp_lead()
+                        or not before
+                        or not before["active"]
+                        or before["role"] != "group_lead"
+                        or before["version"] != expected
+                    ):
+                        raise Conflict
+                    actor = target
+                else:
+                    if uow.active_group_count() or target is not None:
+                        raise AccessDenied
+                    actor = None
             else:
+                if initial_lead_link:
+                    raise InvalidRequest
                 actor = self._actor(uow, actor_identity)
             uid, binding = uow.bind_mcp(identity, target, expected)
             uow.audit_mcp_binding(actor or uid, uid, binding, reason.strip())
             result = uow.person(uid)
+            if initial_lead_link:
+                uow.audit_access(
+                    actor, uid, "access.mcp_initial_lead_link", before, result, reason.strip()
+                )
             uow.commit()
             return result
 

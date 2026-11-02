@@ -79,6 +79,13 @@ python -m factory_ops.bootstrap_mcp_access bind \
   --identity-file "$EMPLOYEE_JWT_FILE" --actor-identity-file "$LEAD_JWT_FILE" \
   --reason "$APPROVAL_REFERENCE" --confirm-offline-change
 
+# 若原有负责人仅关联 Feishu、尚无任何活动 MCP 负责人，操作员凭明确审批进行首次关联。
+# 目标必须是已有活动 group_lead；不升角色，版本不匹配或已有 MCP 负责人时拒绝。
+python -m factory_ops.bootstrap_mcp_access bind \
+  --identity-file "$LEAD_JWT_FILE" --target "$EXISTING_LEAD_INTERNAL_ID" \
+  --expected-version "$EXISTING_LEAD_VERSION" --confirm-initial-lead-link \
+  --reason "$APPROVAL_REFERENCE" --confirm-offline-change
+
 # 同一内部账号关联另一已核实身份时，bind 额外传 --target 与 --expected-version。
 # 授予工程师 A/B 两厂；factory 参数表示完整替换后的授权集合。
 python -m factory_ops.bootstrap_mcp_access grant \
