@@ -1,0 +1,1053 @@
+diff --git a/docs/factory-ops-monitor-integration-r1/README.md b/docs/factory-ops-monitor-integration-r1/README.md
+new file mode 100644
+index 0000000..5c21ddd
+--- /dev/null
++++ b/docs/factory-ops-monitor-integration-r1/README.md
+@@ -0,0 +1,84 @@
++# Native Operations Integration R1
++
++TASK_ID=FACTORY_OPS_MONITOR_SITE_INTEGRATION_R1
++
++## Provenance and Authorization
++
++- Monitor base: `91b686a313e2f73e0fec9459404ac8ef2b3abc19`.
++- Branch: `codex/factory-ops-monitor-portal-r1`.
++- Canonical local source: `/Users/charles/Documents/监控系统/vue_switch_work`.
++- Remote is `ssh://coldstorageamz/mnt/data/opencode-test`, not GitHub. No SSH
++  fetch/push, remote command, server edit, deploy, Ready or merge was performed.
++- Worktree: `/Users/charles/codex-monitor-portal-r1`. It is selectively materialized
++  because the original source is in cloud-managed storage. All 166 available
++  source files were compared to pinned Git blob IDs before any edit. Unavailable
++  historic previews/docs stay unchanged in the commit tree, not deleted.
++- Backups: `/Users/charles/factory-ops-monitor-r1-backup/`, private permissions.
++  Operations main archive SHA256:
++  `4ee45d436ef916d3e4c57d1cab2250f1a458c1e9f8c9b81187e692a1a06f3ddf`.
++  Retained tested monitor source archive SHA256:
++  `13d9de4cd9f698003901cf26918d723bfc20c507166f87c6f1afb58a7cee827e`.
++
++## Implementation
++
++The existing Vue router imports `/operations` from a source export of
++`xuezhiorange-png/factory-operations-platform` at
++`dba043667970e6019dbdc7a8420969d82411d090`. There is no operations iframe, second
++application mount, independent landing page, duplicate dashboard or new monitor
++store. The existing independent Xinshao model is unchanged.
++
++`frontend/vendor/factory-operations-portal/SOURCE.json` records the clean source
++commit and hashes for all 37 reused files. Refresh using the operations repo's
++`scripts/export_monitor_portal.mjs` from a reviewed clean commit, not manual edits
++to vendored business components. Vue/router/icons are resolved by the existing
++Vite dedupe configuration.
++
++PC/header/home-rail and H5 navigation gain an operations entry. The original four
++monitoring H5 entries and account button remain. The factory dialog gains an
++icon link to an exact reviewed gateway identity. Grouped/unknown identities never
++guess a factory by name. Operations-to-monitor return revalidates the personal
++operations session/asset pair, then checks factory/gateway/device against the
++reviewed registry before resolving a current monitor device.
++
++The generated `operations-registry.json` contains only source-defined IDs, no
++telemetry, personal data or credentials. Rebuild it with
++`node scripts/export-operations-registry.cjs` after an approved registry edit.
++Its source hash and complete target-ID sets are regression-tested.
++
++## Authentication and Deployment Gates
++
++Monitor role accounts are not verified personal identities. Unified login is
++BLOCKED. Native operations queries send no monitor Authorization header, use an
++independently verified operations session and keep PostgreSQL factory isolation
++and audit checks on the existing FastAPI side. No shared admin/user-ID workaround.
++No monitor SQLite, Node API, PLC, collection, alert or device-control logic changed.
++
++The development proxy `/operations-api/v1/*` maps to FastAPI `/api/v1/*`.
++`OPERATIONS_API_DEV_TARGET` is a local-development target, not evidence of a free
++production port. No production Nginx location has been installed. The review-only
++example lives in the operations repo under `deploy/monitor-site/`.
++
++Real ID mappings are empty until explicitly reviewed and configured server-side.
++Unknown links show `尚未关联`, never another factory/device's data. Six unfinished
++business modules show `待开发`, not mock business records.
++
++## Validation
++
++- Full monitor tests: 163 passed, no failures/skips (160 existing + 3 new).
++- Existing frontend typecheck and multi-entry Vite build pass. The existing
++  Three.js chunk advisory remains visible; no build threshold was relaxed.
++- Actual App.vue browser checks: desktop1440, tablet768, H5 390/320 widths;
++  native table/detail/return, zero horizontal portal overflow and no module iframe.
++- Original home 3D map rendered, and devices/alarm/energy navigation remained
++  functional with explicitly empty synthetic monitor data. This is not real
++  telemetry, physical-phone, actual control or production-server acceptance.
++- Operations API/PostgreSQL authorization, revocation and ID-mapping tests passed
++  separately. No synthetic session is shipped in production sources.
++- Operations repo delivery evidence contains the detailed source audit,
++  screenshots, rejected compositor captures and exact CI references.
++
++READY_FOR_DEPLOYMENT=NO. Personal SSO, real ID-map approval, user-run PR #10 server
++audit, review, exact-head CI and recoverable deployment backup remain gates.
++
++No production rollback is needed. Revert only this scoped local change for source
++rollback; do not restore a database, change credentials or restart services.
+diff --git a/frontend/src/components/AppIcon.vue b/frontend/src/components/AppIcon.vue
+index 8d35fa1..252f7f4 100644
+--- a/frontend/src/components/AppIcon.vue
++++ b/frontend/src/components/AppIcon.vue
+@@ -1,5 +1,6 @@
+ <template>
+-  <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
++  <Wrench v-if="name === 'operations'" class="app-icon" aria-hidden="true" />
++  <svg v-else class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+     <template v-if="name === 'overview'">
+       <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+       <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+@@ -49,5 +50,6 @@
+ </template>
+ 
+ <script setup>
++import { Wrench } from '@lucide/vue'
+ defineProps({ name: { type: String, required: true } })
+ </script>
+diff --git a/frontend/src/components/DeviceModal.vue b/frontend/src/components/DeviceModal.vue
+index 948c8ab..4789055 100644
+--- a/frontend/src/components/DeviceModal.vue
++++ b/frontend/src/components/DeviceModal.vue
+@@ -4,6 +4,7 @@
+       <template #temperature-trend="{ room, threshold }"><RoomTemperatureTrend :key="roomKey(room)" :room="room" :rooms="historyRooms" :threshold="threshold" :load-history="temperatureHistory.load"/></template>
+       <template #sim-cards><SimCards v-if="auth.role === 'admin'" embedded :equipment-ids="device?.sourceEquipmentIds || []"/></template>
+       <template #space><FactorySpaceView v-if="factorySpace" :space="factorySpace" /></template>
++      <template #operations><button class="fi-icon-button" aria-label="查看设备运维档案" title="设备运维档案" @click="openOperations"><Wrench :size="18" /></button></template>
+       <template #units>
+         <UnitOverview :units="jizus" :read-only="!auth.isAdmin" :busy="saving || !!busyRoom" :error="data.lastError" :demo="designPreview" @temperature="({ unit, type }) => openJizuTempPicker(unit, type)" />
+       </template>
+@@ -57,6 +58,8 @@ import { api } from '../api'
+ import { cleanName, deviceSuffix, gPow, FLAGSHIP_MAP } from '../utils'
+ import { canConfigureUnitTarget, unitIdentity } from '../unit-inspection'
+ import { createTemperatureHistoryLoader } from '../room-temperature-history'
++import { Wrench } from '@lucide/vue'
++import { operationsRouteForGateways } from '../operations-monitor'
+ 
+ defineProps({ initialView: { type: String, default: 'rooms' } })
+ const RoomTemperatureTrend = defineAsyncComponent({
+@@ -202,6 +205,11 @@ function navigate(path) {
+   close()
+   if (!visible.value) router.push(path)
+ }
++function openOperations() {
++  const destination = operationsRouteForGateways(device.value?.sourceEquipmentIds)
++  close()
++  if (!visible.value) router.push(destination)
++}
+ 
+ async function loadDetails() {
+   const name = device.value?.isGroup ? device.value.name : device.value?.name
+diff --git a/frontend/src/components/FactoryMonitor.vue b/frontend/src/components/FactoryMonitor.vue
+index 9bc9d78..6492406 100644
+--- a/frontend/src/components/FactoryMonitor.vue
++++ b/frontend/src/components/FactoryMonitor.vue
+@@ -11,6 +11,7 @@
+         <header class="fi-title-band">
+           <div class="fi-title-group"><button ref="backButton" class="fi-icon-button fi-back" aria-label="返回加工厂列表" title="返回" @click="emit('close')"><ArrowLeft :size="20" /></button><div><p class="fi-eyebrow">加工厂 / {{ activeView === 'space' ? '方案空间' : '冷间监控' }}</p><h1>{{ title || '加工厂' }}<span v-if="brand" class="fi-brand-tag">{{ brand }}</span></h1></div><button v-if="activeView !== 'space'" class="fi-icon-button fi-mobile-fullscreen" :aria-label="fullOverview ? '退出全屏总览' : '全屏显示全部冷间'" :title="fullOverview ? '退出全屏' : '全屏'" @click="toggleFullscreen"><Minimize v-if="fullOverview" :size="17" /><Maximize v-else :size="17" /></button></div>
+           <div v-if="activeView !== 'space'" class="fi-factory-stats"><span>冷间 <b class="fi-number">{{ entries.length }}</b></span><span>超温 <b class="fi-number" :class="{ 'fi-danger': hotCount }">{{ hotCount }}</b></span><span>离线 <b class="fi-number" :class="{ 'fi-warning': offlineCount }">{{ offlineCount }}</b></span><span class="fi-energy">今日用电 <b class="fi-number">{{ format(todayPower) }}<small>kWh</small></b></span></div>
++          <slot name="operations" />
+         </header>
+ 
+         <div v-if="error" class="fi-error" role="status">{{ error }}<button :disabled="refreshing" @click="emit('refresh')">重试</button></div>
+diff --git a/frontend/src/components/MobileNav.vue b/frontend/src/components/MobileNav.vue
+index 133fa9c..87bcf13 100644
+--- a/frontend/src/components/MobileNav.vue
++++ b/frontend/src/components/MobileNav.vue
+@@ -112,6 +112,7 @@ const navItems = [
+   { page: '/devices', icon: 'devices', label: '设备' },
+   { page: '/alarms', icon: 'alarms', label: '报警' },
+   { page: '/power', icon: 'energy', label: '能耗' },
++  { page: '/operations', icon: 'operations', label: '运维' },
+ ]
+ 
+ function isActive(page) { return page === '/' ? route.path === '/' : route.path.startsWith(page) }
+diff --git a/frontend/src/components/OperationsMonitorLink.vue b/frontend/src/components/OperationsMonitorLink.vue
+new file mode 100644
+index 0000000..b92d488
+--- /dev/null
++++ b/frontend/src/components/OperationsMonitorLink.vue
+@@ -0,0 +1,27 @@
++<script setup>
++import { computed, onUnmounted, ref, watch } from 'vue'
++import { useRoute } from 'vue-router'
++import { useDataStore } from '../stores/data'
++import { readLink } from '../../vendor/factory-operations-portal/src/integrations/monitor/links'
++import { linkedGateway, validMonitoringLink } from '../operations-monitor'
++const emit = defineEmits(['open'])
++const route = useRoute(), data = useDataStore(), link = ref(null), message = ref('正在校验监控关联…')
++const device = computed(() => linkedGateway(link.value, data.devices))
++let controller
++watch(() => route.fullPath, async () => {
++  controller?.abort()
++  const current = new AbortController(); controller = current
++  link.value = null; message.value = '正在校验监控关联…'
++  try {
++    const factory = route.query.ops_factory, asset = route.query.ops_asset
++    if (typeof factory !== 'string' || typeof asset !== 'string') { message.value = '尚未关联'; return }
++    const result = await readLink('asset-link', { factory_id: factory, asset_id: asset }, current.signal)
++    if (current.signal.aborted) return
++    if (!validMonitoringLink(result)) { message.value = '尚未关联'; return }
++    link.value = result; message.value = `已关联 ${result.monitor_device_id}`
++  } catch { if (!current.signal.aborted) message.value = '关联查询失败或无访问权限' }
++}, { immediate: true })
++onUnmounted(() => controller?.abort())
++</script>
++<template><div class="operations-return" role="status"><span>{{ message }}</span><template v-if="device"><span>{{ device.online ? '网关在线' : '网关离线' }}</span><button @click="emit('open', device)">查看设备状态</button></template><span v-else-if="link">监控数据未就绪</span></div></template>
++<style scoped>.operations-return{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:12px 0;margin-bottom:16px;border-block:1px solid #526550;color:#b8cc9e;font-size:13px}.operations-return button{border:1px solid #526550;background:#27352c;color:inherit;border-radius:4px;padding:7px 12px;min-height:38px;cursor:pointer}</style>
+diff --git a/frontend/src/navigation.ts b/frontend/src/navigation.ts
+index 0d57a9b..4b3d657 100644
+--- a/frontend/src/navigation.ts
++++ b/frontend/src/navigation.ts
+@@ -10,6 +10,7 @@ export const primaryNavigation: NavItem[] = [
+   { page: '/devices', icon: 'devices', label: '设备管理' },
+   { page: '/alarms', icon: 'alarms', label: '报警中心' },
+   { page: '/power', icon: 'energy', label: '能耗分析' },
++  { page: '/operations', icon: 'operations', label: '设备运维' },
+ ]
+ 
+ export const managementNavigation: NavItem[] = [
+diff --git a/frontend/src/operations-monitor.js b/frontend/src/operations-monitor.js
+new file mode 100644
+index 0000000..0ccc4c7
+--- /dev/null
++++ b/frontend/src/operations-monitor.js
+@@ -0,0 +1,20 @@
++import registry from './operations-registry.json' with { type: 'json' }
++
++export function operationsRouteForGateways(ids) {
++  const gateways = [...new Set((ids || []).map(String))]
++  if (gateways.length !== 1) return { path: '/operations/from-monitor' }
++  const device = registry.devices.find(item => item.id === gateways[0])
++  return device ? { path: '/operations/from-monitor', query: { monitor_factory_id: device.factory, monitor_device_id: device.id } }
++    : { path: '/operations/from-monitor' }
++}
++
++export function validMonitoringLink(link) {
++  if (!link) return false
++  return registry.devices.some(device => device.id === link.monitor_gateway_id
++    && device.factory === link.monitor_factory_id && device.targets.includes(link.monitor_device_id))
++}
++
++export function linkedGateway(link, devices) {
++  if (!validMonitoringLink(link)) return null
++  return devices.find(device => String(device.id) === link.monitor_gateway_id) || null
++}
+diff --git a/frontend/src/operations-registry.json b/frontend/src/operations-registry.json
+new file mode 100644
+index 0000000..b0fd6fe
+--- /dev/null
++++ b/frontend/src/operations-registry.json
+@@ -0,0 +1,684 @@
++{
++  "source": "server/monitoring/registry.js",
++  "sha256": "92e4ccd6474f6085ad5affbc1a57fac2cf0d3bfd0eb8f5baaacc461b7b15febc",
++  "factories": [
++    {
++      "id": "FAC_ZHONGHE",
++      "gateways": [
++        "52536"
++      ]
++    },
++    {
++      "id": "FAC_PANLONG",
++      "gateways": [
++        "51386"
++      ]
++    },
++    {
++      "id": "FAC_XIAOXIANG",
++      "gateways": [
++        "47235"
++      ]
++    },
++    {
++      "id": "FAC_BAISHUI",
++      "gateways": [
++        "47234"
++      ]
++    },
++    {
++      "id": "FAC_KUANGZHUANG",
++      "gateways": [
++        "47133"
++      ]
++    },
++    {
++      "id": "FAC_SHUANGLONGYING_2",
++      "gateways": [
++        "46855"
++      ]
++    },
++    {
++      "id": "FAC_MOUDING",
++      "gateways": [
++        "45865"
++      ]
++    },
++    {
++      "id": "FAC_XINSHAO_2",
++      "gateways": [
++        "45482"
++      ]
++    },
++    {
++      "id": "FAC_TIANXING",
++      "gateways": [
++        "36229"
++      ]
++    },
++    {
++      "id": "FAC_SHUANGLONGYING_1",
++      "gateways": [
++        "34339",
++        "34338",
++        "34292"
++      ]
++    },
++    {
++      "id": "FAC_RIZHE",
++      "gateways": [
++        "31417"
++      ]
++    }
++  ],
++  "devices": [
++    {
++      "id": "52536",
++      "factory": "FAC_ZHONGHE",
++      "targets": [
++        "52536",
++        "ROOM_D52536_FINISHED_GOODS",
++        "ROOM_D52536_SECONDARY_PRECOOL_3",
++        "ROOM_D52536_SECONDARY_PRECOOL_2",
++        "ROOM_D52536_SECONDARY_PRECOOL_1"
++      ]
++    },
++    {
++      "id": "51386",
++      "factory": "FAC_PANLONG",
++      "targets": [
++        "51386",
++        "ROOM_D51386_PACKING",
++        "ROOM_D51386_RAW_STORAGE",
++        "ROOM_D51386_PRIMARY_PRECOOL_4",
++        "ROOM_D51386_PRIMARY_PRECOOL_3",
++        "ROOM_D51386_PRIMARY_PRECOOL_2",
++        "ROOM_D51386_PRIMARY_PRECOOL_1",
++        "ROOM_D51386_SHIPPING",
++        "ROOM_D51386_FILMING",
++        "ROOM_D51386_FINISHED_GOODS_2",
++        "ROOM_D51386_FINISHED_GOODS_1",
++        "ROOM_D51386_SECONDARY_PRECOOL_4",
++        "ROOM_D51386_SECONDARY_PRECOOL_3",
++        "ROOM_D51386_SECONDARY_PRECOOL_2",
++        "ROOM_D51386_SECONDARY_PRECOOL_1"
++      ]
++    },
++    {
++      "id": "47235",
++      "factory": "FAC_XIAOXIANG",
++      "targets": [
++        "47235",
++        "ROOM_D47235_BYPRODUCT",
++        "ROOM_D47235_FROZEN_GOODS",
++        "ROOM_D47235_SHIPPING",
++        "ROOM_D47235_RAW_STORAGE",
++        "ROOM_D47235_PACKING",
++        "ROOM_D47235_FINISHED_GOODS",
++        "ROOM_D47235_SECONDARY_PRECOOL_2",
++        "ROOM_D47235_SECONDARY_PRECOOL_1",
++        "ROOM_D47235_PRIMARY_PRECOOL_2",
++        "ROOM_D47235_PRIMARY_PRECOOL_1",
++        "FAN_ROOM_D47235_FINISHED_GOODS_COLD_01"
++      ]
++    },
++    {
++      "id": "47234",
++      "factory": "FAC_BAISHUI",
++      "targets": [
++        "47234",
++        "ROOM_D47234_RAW_STORAGE",
++        "ROOM_D47234_PACKING",
++        "ROOM_D47234_PRIMARY_PRECOOL_1",
++        "ROOM_D47234_PRIMARY_PRECOOL_2",
++        "ROOM_D47234_PRIMARY_PRECOOL_3",
++        "ROOM_D47234_SECONDARY_PRECOOL_1",
++        "ROOM_D47234_SECONDARY_PRECOOL_2",
++        "ROOM_D47234_FINISHED_GOODS",
++        "ROOM_D47234_SHIPPING",
++        "ROOM_D47234_BYPRODUCT",
++        "ROOM_D47234_FROZEN_GOODS",
++        "ROOM_D47234_FILMING",
++        "FAN_ROOM_D47234_RAW_STORAGE_COLD_01",
++        "FAN_ROOM_D47234_PACKING_COLD_01",
++        "FAN_ROOM_D47234_PRIMARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D47234_PRIMARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D47234_PRIMARY_PRECOOL_3_COLD_01",
++        "FAN_ROOM_D47234_SECONDARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D47234_SECONDARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D47234_FINISHED_GOODS_COLD_01",
++        "FAN_ROOM_D47234_SHIPPING_COLD_01",
++        "FAN_ROOM_D47234_BYPRODUCT_COLD_01",
++        "FAN_ROOM_D47234_FROZEN_GOODS_COLD_01",
++        "FAN_ROOM_D47234_FILMING_COLD_01"
++      ]
++    },
++    {
++      "id": "47133",
++      "factory": "FAC_KUANGZHUANG",
++      "targets": [
++        "47133",
++        "ROOM_D47133_RAW_STORAGE",
++        "ROOM_D47133_PACKING",
++        "ROOM_D47133_PRIMARY_PRECOOL_1",
++        "ROOM_D47133_PRIMARY_PRECOOL_2",
++        "ROOM_D47133_SECONDARY_PRECOOL",
++        "ROOM_D47133_FINISHED_GOODS",
++        "ROOM_D47133_SHIPPING",
++        "FAN_ROOM_D47133_RAW_STORAGE_COLD_01",
++        "FAN_ROOM_D47133_PACKING_COLD_01",
++        "FAN_ROOM_D47133_PACKING_COLD_02",
++        "FAN_ROOM_D47133_PACKING_COLD_03",
++        "FAN_ROOM_D47133_PACKING_COLD_04",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_1_AXIAL_01",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_1_AXIAL_02",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_1_AXIAL_03",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_2_AXIAL_01",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_2_AXIAL_02",
++        "FAN_ROOM_D47133_PRIMARY_PRECOOL_2_AXIAL_03",
++        "FAN_ROOM_D47133_SECONDARY_PRECOOL_COLD_01",
++        "FAN_ROOM_D47133_SECONDARY_PRECOOL_AXIAL_01",
++        "FAN_ROOM_D47133_SECONDARY_PRECOOL_AXIAL_02",
++        "FAN_ROOM_D47133_SECONDARY_PRECOOL_AXIAL_03",
++        "FAN_ROOM_D47133_FINISHED_GOODS_COLD_01",
++        "FAN_ROOM_D47133_FINISHED_GOODS_COLD_02",
++        "FAN_ROOM_D47133_SHIPPING_COLD_01"
++      ]
++    },
++    {
++      "id": "46855",
++      "factory": "FAC_SHUANGLONGYING_2",
++      "targets": [
++        "46855",
++        "ROOM_D46855_RAW_STORAGE_1",
++        "ROOM_D46855_RAW_STORAGE_2",
++        "ROOM_D46855_PACKING_1",
++        "ROOM_D46855_PACKING_2",
++        "ROOM_D46855_PRIMARY_PRECOOL_1",
++        "ROOM_D46855_PRIMARY_PRECOOL_2",
++        "ROOM_D46855_PRIMARY_PRECOOL_3",
++        "ROOM_D46855_PRIMARY_PRECOOL_4",
++        "ROOM_D46855_SECONDARY_PRECOOL_1",
++        "ROOM_D46855_SECONDARY_PRECOOL_2",
++        "ROOM_D46855_SECONDARY_PRECOOL_3",
++        "ROOM_D46855_SECONDARY_PRECOOL_4",
++        "ROOM_D46855_FINISHED_GOODS_1",
++        "ROOM_D46855_FINISHED_GOODS_2",
++        "ROOM_D46855_SHIPPING",
++        "ROOM_D46855_BYPRODUCT",
++        "ROOM_D46855_FROZEN_GOODS",
++        "FAN_ROOM_D46855_RAW_STORAGE_1_COLD_01",
++        "FAN_ROOM_D46855_RAW_STORAGE_2_COLD_01",
++        "FAN_ROOM_D46855_PACKING_1_COLD_01",
++        "FAN_ROOM_D46855_PACKING_1_COLD_02",
++        "FAN_ROOM_D46855_PACKING_1_COLD_03",
++        "FAN_ROOM_D46855_PACKING_1_COLD_04",
++        "FAN_ROOM_D46855_PACKING_2_COLD_01",
++        "FAN_ROOM_D46855_PACKING_2_COLD_02",
++        "FAN_ROOM_D46855_PACKING_2_COLD_03",
++        "FAN_ROOM_D46855_PACKING_2_COLD_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_COLD_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_COLD_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_COLD_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_05",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_06",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_07",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_08",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_09",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_10",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_11",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_1_AXIAL_12",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_COLD_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_COLD_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_COLD_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_05",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_06",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_07",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_08",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_09",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_10",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_11",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_2_AXIAL_12",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_COLD_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_COLD_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_COLD_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_COLD_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_05",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_06",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_07",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_08",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_09",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_10",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_11",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_3_AXIAL_12",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_COLD_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_COLD_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_COLD_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_COLD_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_01",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_02",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_03",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_04",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_05",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_06",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_07",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_08",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_09",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_10",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_11",
++        "FAN_ROOM_D46855_PRIMARY_PRECOOL_4_AXIAL_12",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_COLD_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_COLD_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_COLD_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_05",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_06",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_07",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_08",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_09",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_10",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_11",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_1_AXIAL_12",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_COLD_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_COLD_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_COLD_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_05",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_06",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_07",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_08",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_09",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_10",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_11",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_2_AXIAL_12",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_COLD_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_COLD_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_COLD_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_COLD_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_05",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_06",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_07",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_08",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_09",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_10",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_11",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_3_AXIAL_12",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_COLD_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_COLD_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_COLD_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_COLD_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_01",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_02",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_03",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_04",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_05",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_06",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_07",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_08",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_09",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_10",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_11",
++        "FAN_ROOM_D46855_SECONDARY_PRECOOL_4_AXIAL_12",
++        "FAN_ROOM_D46855_FINISHED_GOODS_1_COLD_01",
++        "FAN_ROOM_D46855_FINISHED_GOODS_1_COLD_02",
++        "FAN_ROOM_D46855_FINISHED_GOODS_1_COLD_03",
++        "FAN_ROOM_D46855_FINISHED_GOODS_2_COLD_01",
++        "FAN_ROOM_D46855_FINISHED_GOODS_2_COLD_02",
++        "FAN_ROOM_D46855_FINISHED_GOODS_2_COLD_03",
++        "FAN_ROOM_D46855_SHIPPING_COLD_01",
++        "FAN_ROOM_D46855_SHIPPING_COLD_02",
++        "FAN_ROOM_D46855_BYPRODUCT_COLD_01",
++        "FAN_ROOM_D46855_FROZEN_GOODS_COLD_01"
++      ]
++    },
++    {
++      "id": "45865",
++      "factory": "FAC_MOUDING",
++      "targets": [
++        "45865",
++        "ROOM_D45865_RAW_STORAGE",
++        "ROOM_D45865_SHIPPING",
++        "ROOM_D45865_PRIMARY_PRECOOL_1",
++        "ROOM_D45865_PRIMARY_PRECOOL_2",
++        "ROOM_D45865_SECONDARY_PRECOOL_1",
++        "ROOM_D45865_SECONDARY_PRECOOL_2",
++        "ROOM_D45865_FINISHED_GOODS",
++        "ROOM_D45865_PACKING",
++        "ROOM_D45865_BYPRODUCT",
++        "ROOM_D45865_FROZEN_GOODS",
++        "FAN_ROOM_D45865_RAW_STORAGE_COLD_01",
++        "FAN_ROOM_D45865_RAW_STORAGE_COLD_02",
++        "FAN_ROOM_D45865_SHIPPING_COLD_01",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_COLD_02",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_AXIAL_01",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_AXIAL_02",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_AXIAL_03",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_AXIAL_04",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_AXIAL_05",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_AXIAL_06",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_1_AXIAL_07",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_COLD_02",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_AXIAL_01",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_AXIAL_02",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_AXIAL_03",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_AXIAL_04",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_AXIAL_05",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_AXIAL_06",
++        "FAN_ROOM_D45865_PRIMARY_PRECOOL_2_AXIAL_07",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_COLD_02",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_AXIAL_01",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_AXIAL_02",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_AXIAL_03",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_AXIAL_04",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_AXIAL_05",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_1_AXIAL_06",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_COLD_02",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_AXIAL_01",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_AXIAL_02",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_AXIAL_03",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_AXIAL_04",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_AXIAL_05",
++        "FAN_ROOM_D45865_SECONDARY_PRECOOL_2_AXIAL_06",
++        "FAN_ROOM_D45865_FINISHED_GOODS_COLD_01",
++        "FAN_ROOM_D45865_FINISHED_GOODS_COLD_02",
++        "FAN_ROOM_D45865_FINISHED_GOODS_COLD_03",
++        "FAN_ROOM_D45865_FINISHED_GOODS_COLD_04",
++        "FAN_ROOM_D45865_PACKING_COLD_01",
++        "FAN_ROOM_D45865_PACKING_COLD_02",
++        "FAN_ROOM_D45865_PACKING_COLD_03",
++        "FAN_ROOM_D45865_PACKING_COLD_04",
++        "FAN_ROOM_D45865_PACKING_COLD_05",
++        "FAN_ROOM_D45865_PACKING_COLD_06",
++        "FAN_ROOM_D45865_BYPRODUCT_COLD_01",
++        "FAN_ROOM_D45865_FROZEN_GOODS_COLD_01"
++      ]
++    },
++    {
++      "id": "45482",
++      "factory": "FAC_XINSHAO_2",
++      "targets": [
++        "45482",
++        "ROOM_D45482_SECONDARY_PRECOOL_4",
++        "ROOM_D45482_SECONDARY_PRECOOL_3",
++        "ROOM_D45482_SECONDARY_PRECOOL_2",
++        "ROOM_D45482_SECONDARY_PRECOOL_1",
++        "ROOM_D45482_PRIMARY_PRECOOL_4",
++        "ROOM_D45482_PRIMARY_PRECOOL_3",
++        "ROOM_D45482_PRIMARY_PRECOOL_2",
++        "ROOM_D45482_PRIMARY_PRECOOL_1",
++        "ROOM_D45482_PACKING_2",
++        "ROOM_D45482_PACKING_1",
++        "ROOM_D45482_RAW_STORAGE",
++        "ROOM_D45482_INBOUND",
++        "ROOM_D45482_FILMING",
++        "ROOM_D45482_FINISHED_GOODS_2",
++        "ROOM_D45482_FINISHED_GOODS_1",
++        "ROOM_D45482_SHIPPING",
++        "ROOM_D45482_BYPRODUCT",
++        "ROOM_D45482_FROZEN_GOODS",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_COLD_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_COLD_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_COLD_03",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_COLD_04",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_03",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_04",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_05",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_06",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_07",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_08",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_09",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_10",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_11",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_4_AXIAL_12",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_COLD_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_COLD_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_COLD_03",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_COLD_04",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_03",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_04",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_05",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_06",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_07",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_08",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_09",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_10",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_11",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_3_AXIAL_12",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_COLD_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_COLD_03",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_COLD_04",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_03",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_04",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_05",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_06",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_07",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_08",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_09",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_10",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_11",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_2_AXIAL_12",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_COLD_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_AXIAL_01",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_AXIAL_02",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_AXIAL_03",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_AXIAL_04",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_AXIAL_05",
++        "FAN_ROOM_D45482_SECONDARY_PRECOOL_1_AXIAL_06",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_COLD_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_COLD_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_COLD_03",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_COLD_04",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_03",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_04",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_05",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_06",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_07",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_08",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_09",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_10",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_11",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_12",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_13",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_14",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_15",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_4_AXIAL_16",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_COLD_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_COLD_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_COLD_03",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_COLD_04",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_03",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_04",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_05",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_06",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_07",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_08",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_09",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_10",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_11",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_12",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_13",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_14",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_15",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_3_AXIAL_16",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_COLD_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_COLD_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_COLD_03",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_COLD_04",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_03",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_04",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_05",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_06",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_07",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_08",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_09",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_10",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_11",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_12",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_13",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_14",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_15",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_2_AXIAL_16",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_COLD_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_COLD_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_01",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_02",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_03",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_04",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_05",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_06",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_07",
++        "FAN_ROOM_D45482_PRIMARY_PRECOOL_1_AXIAL_08",
++        "FAN_ROOM_D45482_PACKING_2_COLD_01",
++        "FAN_ROOM_D45482_PACKING_2_COLD_02",
++        "FAN_ROOM_D45482_PACKING_2_COLD_03",
++        "FAN_ROOM_D45482_PACKING_2_COLD_04",
++        "FAN_ROOM_D45482_PACKING_2_COLD_05",
++        "FAN_ROOM_D45482_PACKING_2_COLD_06",
++        "FAN_ROOM_D45482_PACKING_2_COLD_07",
++        "FAN_ROOM_D45482_PACKING_2_COLD_08",
++        "FAN_ROOM_D45482_PACKING_2_COLD_09",
++        "FAN_ROOM_D45482_PACKING_2_COLD_10",
++        "FAN_ROOM_D45482_PACKING_2_COLD_11",
++        "FAN_ROOM_D45482_PACKING_2_COLD_12",
++        "FAN_ROOM_D45482_PACKING_2_COLD_13",
++        "FAN_ROOM_D45482_PACKING_2_COLD_14",
++        "FAN_ROOM_D45482_PACKING_2_COLD_15",
++        "FAN_ROOM_D45482_PACKING_1_COLD_01",
++        "FAN_ROOM_D45482_PACKING_1_COLD_02",
++        "FAN_ROOM_D45482_PACKING_1_COLD_03",
++        "FAN_ROOM_D45482_PACKING_1_COLD_04",
++        "FAN_ROOM_D45482_PACKING_1_COLD_05",
++        "FAN_ROOM_D45482_PACKING_1_COLD_06",
++        "FAN_ROOM_D45482_PACKING_1_COLD_07",
++        "FAN_ROOM_D45482_PACKING_1_COLD_08",
++        "FAN_ROOM_D45482_PACKING_1_COLD_09",
++        "FAN_ROOM_D45482_PACKING_1_COLD_10",
++        "FAN_ROOM_D45482_PACKING_1_COLD_11",
++        "FAN_ROOM_D45482_PACKING_1_COLD_12",
++        "FAN_ROOM_D45482_PACKING_1_COLD_13",
++        "FAN_ROOM_D45482_PACKING_1_COLD_14",
++        "FAN_ROOM_D45482_PACKING_1_COLD_15",
++        "FAN_ROOM_D45482_PACKING_1_COLD_16",
++        "FAN_ROOM_D45482_RAW_STORAGE_COLD_01",
++        "FAN_ROOM_D45482_RAW_STORAGE_COLD_02",
++        "FAN_ROOM_D45482_RAW_STORAGE_COLD_03",
++        "FAN_ROOM_D45482_INBOUND_COLD_01",
++        "FAN_ROOM_D45482_INBOUND_COLD_02",
++        "FAN_ROOM_D45482_FILMING_COLD_01",
++        "FAN_ROOM_D45482_FILMING_COLD_02",
++        "FAN_ROOM_D45482_FILMING_COLD_03",
++        "FAN_ROOM_D45482_FILMING_COLD_04",
++        "FAN_ROOM_D45482_FINISHED_GOODS_2_COLD_01",
++        "FAN_ROOM_D45482_FINISHED_GOODS_2_COLD_02",
++        "FAN_ROOM_D45482_FINISHED_GOODS_2_COLD_03",
++        "FAN_ROOM_D45482_FINISHED_GOODS_1_COLD_01",
++        "FAN_ROOM_D45482_FINISHED_GOODS_1_COLD_02",
++        "FAN_ROOM_D45482_FINISHED_GOODS_1_COLD_03",
++        "FAN_ROOM_D45482_FINISHED_GOODS_1_COLD_04",
++        "FAN_ROOM_D45482_SHIPPING_COLD_01",
++        "FAN_ROOM_D45482_SHIPPING_COLD_02",
++        "FAN_ROOM_D45482_SHIPPING_COLD_03",
++        "FAN_ROOM_D45482_BYPRODUCT_COLD_01",
++        "FAN_ROOM_D45482_FROZEN_GOODS_COLD_01"
++      ]
++    },
++    {
++      "id": "36229",
++      "factory": "FAC_TIANXING",
++      "targets": [
++        "36229"
++      ]
++    },
++    {
++      "id": "34339",
++      "factory": "FAC_SHUANGLONGYING_1",
++      "targets": [
++        "34339"
++      ]
++    },
++    {
++      "id": "34338",
++      "factory": "FAC_SHUANGLONGYING_1",
++      "targets": [
++        "34338"
++      ]
++    },
++    {
++      "id": "34292",
++      "factory": "FAC_SHUANGLONGYING_1",
++      "targets": [
++        "34292",
++        "ROOM_D34292_RAW_STORAGE",
++        "ROOM_D34292_PACKING",
++        "ROOM_D34292_PRIMARY_PRECOOL_1",
++        "ROOM_D34292_PRIMARY_PRECOOL_2",
++        "ROOM_D34292_PRIMARY_PRECOOL_3",
++        "ROOM_D34292_SECONDARY_PRECOOL_1",
++        "ROOM_D34292_SECONDARY_PRECOOL_2",
++        "ROOM_D34292_SECONDARY_PRECOOL_3",
++        "ROOM_D34292_FINISHED_GOODS_1",
++        "ROOM_D34292_FINISHED_GOODS_2",
++        "ROOM_D34292_SHIPPING"
++      ]
++    },
++    {
++      "id": "31417",
++      "factory": "FAC_RIZHE",
++      "targets": [
++        "31417",
++        "ROOM_D31417_OUTFLOW_3_2",
++        "ROOM_D31417_OUTFLOW_3_1",
++        "ROOM_D31417_OUTFLOW_2_2",
++        "ROOM_D31417_OUTFLOW_2_1",
++        "ROOM_D31417_OUTFLOW_1_2",
++        "ROOM_D31417_OUTFLOW_1_1"
++      ]
++    }
++  ]
++}
+diff --git a/frontend/src/router.js b/frontend/src/router.js
+index 859aeb8..918ef19 100644
+--- a/frontend/src/router.js
++++ b/frontend/src/router.js
+@@ -1,6 +1,8 @@
+ import { createRouter, createWebHistory } from 'vue-router'
++import { createOperationsRoutes } from '../vendor/factory-operations-portal/src/integrations/monitor'
+ 
+ export const routes = [
++  ...createOperationsRoutes(),
+   { path: '/', name: 'dashboard', component: () => import('./views/CommandCenter.vue') },
+   { path: '/devices', name: 'devices', component: () => import('./views/Devices.vue') },
+   { path: '/alarms', name: 'alarms', component: () => import('./views/Alarms.vue') },
+diff --git a/frontend/src/views/CommandCenter.vue b/frontend/src/views/CommandCenter.vue
+index 50b603a..4a46eaa 100644
+--- a/frontend/src/views/CommandCenter.vue
++++ b/frontend/src/views/CommandCenter.vue
+@@ -55,7 +55,7 @@
+ </template>
+ <script setup>
+ import { computed, defineAsyncComponent, inject, nextTick, onMounted, onUnmounted, ref } from 'vue'
+-import { Activity, ArrowUpRight, BarChart3, Bell, CalendarDays, Check, ChevronDown, ChevronRight, Code2, Ellipsis, FileText, LayoutGrid, Monitor, RefreshCw, Search, Settings, ShieldCheck, UserRound, X, Zap } from '@lucide/vue'
++import { Activity, ArrowUpRight, BarChart3, Bell, CalendarDays, Check, ChevronDown, ChevronRight, Code2, Ellipsis, FileText, LayoutGrid, Monitor, RefreshCw, Search, Settings, ShieldCheck, UserRound, Wrench, X, Zap } from '@lucide/vue'
+ import { useAuthStore } from '../stores/auth'
+ import { useDataStore } from '../stores/data'
+ import { managementNavigation, primaryNavigation } from '../navigation'
+@@ -71,7 +71,7 @@ const data = useDataStore(), auth = useAuthStore(), showDevice = inject('showDev
+ const now = ref(Date.now()), alarmFilter = ref(''), alarmPeriod = ref(''), alarmSort = ref('priority'), alarmMenu = ref(null)
+ const baseStatus = ref(''), baseMeasure = ref('count'), connectionBase = ref('')
+ const directory = ref(null), directorySearch = ref(null), search = ref(''), directoryBase = ref(''), factoryFilter = ref('')
+-const navIcons = { overview: LayoutGrid, devices: Monitor, alarms: Bell, energy: Zap, report: FileText, activity: Activity, settings: Settings, devlog: Code2 }
++const navIcons = { overview: LayoutGrid, devices: Monitor, alarms: Bell, energy: Zap, report: FileText, activity: Activity, settings: Settings, devlog: Code2, operations: Wrench }
+ const railNavigation = computed(() => [...primaryNavigation, ...managementNavigation.filter(item => !item.adminOnly || auth.isAdmin)])
+ const summary = computed(() => siteSummary(data.devices))
+ const bases = computed(() => [...new Set(summary.value.factories.map(factory => factory.brand || '未分类'))].sort((a,b) => a.localeCompare(b,'zh-CN')))
+diff --git a/frontend/src/views/Devices.vue b/frontend/src/views/Devices.vue
+index 951cb31..dd840f5 100644
+--- a/frontend/src/views/Devices.vue
++++ b/frontend/src/views/Devices.vue
+@@ -1,6 +1,7 @@
+ <template>
+   <div class="workspace-view device-workspace">
+     <WorkspaceHeader title="设备管理" section="设备与冷间" />
++    <OperationsMonitorLink v-if="$route.query.ops_factory || $route.query.ops_asset" @open="openDevice" />
+     <section class="device-summary-band" aria-label="设备状态分布"><div><Monitor :size="20"/><strong>{{ data.devices.length }}</strong><span>接入设备</span></div><div><i class="status-dot is-online"/><strong>{{ data.onlineCount }}</strong><span>在线</span></div><div><i class="status-dot is-offline"/><strong>{{ data.devices.length-data.onlineCount }}</strong><span>离线</span></div><div><Thermometer :size="19"/><strong>{{ roomCount }}</strong><span>冷间</span></div></section>
+     <div class="device-toolbar"><label class="search-field"><Search :size="16"/><input v-model="query" type="search" placeholder="搜索设备或冷间" aria-label="搜索设备"></label><div class="segmented" role="group" aria-label="设备状态筛选"><button v-for="item in statusOptions" :key="item.value" :aria-pressed="status===item.value" @click="status=item.value">{{ item.label }}</button></div><span class="device-result-count">{{ devices.length }} 台设备</span></div>
+     <div v-if="!devices.length" class="empty" role="status">{{ data.loading ? '加载中…' : data.lastError ? '设备数据读取失败' : '没有符合条件的设备' }}</div>
+@@ -25,6 +26,7 @@ import { cleanName, deviceSuffix, fP } from '../utils'
+ import { reading } from '../energy'
+ import { inspectRoom } from '../room-inspection'
+ import WorkspaceHeader from '../components/WorkspaceHeader.vue'
++import OperationsMonitorLink from '../components/OperationsMonitorLink.vue'
+ const data = useDataStore()
+ const showDevice = inject('showDevice')
+ const query = ref(''), status = ref('')
+diff --git a/frontend/vite.config.js b/frontend/vite.config.js
+index 843f1f2..a664c31 100644
+--- a/frontend/vite.config.js
++++ b/frontend/vite.config.js
+@@ -15,6 +15,7 @@ export default defineConfig({
+   },
+   server: {
+     proxy: {
++      '/operations-api': { target: process.env.OPERATIONS_API_DEV_TARGET || 'http://127.0.0.1:8016', rewrite: path => path.replace(/^\/operations-api\/v1(?=\/)/, '/api/v1') },
+       '/api': 'http://localhost:3001',
+       '/manifest.json': 'http://localhost:3001',
+       '/icon.svg': 'http://localhost:3001',
+diff --git a/scripts/export-operations-registry.cjs b/scripts/export-operations-registry.cjs
+new file mode 100644
+index 0000000..2ac6774
+--- /dev/null
++++ b/scripts/export-operations-registry.cjs
+@@ -0,0 +1,17 @@
++const fs = require('node:fs');
++const path = require('node:path');
++const crypto = require('node:crypto');
++const { FACTORY_REGISTRY, DEVICE_REGISTRY, ROOM_REGISTRY, FAN_REGISTRY } = require('../server/monitoring/registry');
++const source = path.join(__dirname, '../server/monitoring/registry.js');
++const registry = {
++  source: 'server/monitoring/registry.js',
++  sha256: crypto.createHash('sha256').update(fs.readFileSync(source)).digest('hex'),
++  factories: FACTORY_REGISTRY.map(factory => ({ id: factory.factory_id, gateways: factory.device_ids })),
++  devices: DEVICE_REGISTRY.map(device => ({
++    id: device.device_id, factory: device.factory_id,
++    targets: [device.device_id,
++      ...ROOM_REGISTRY.filter(room => room.device_id === device.device_id).map(room => room.room_id),
++      ...FAN_REGISTRY.filter(fan => fan.device_id === device.device_id).map(fan => fan.fan_id)],
++  })),
++};
++fs.writeFileSync(path.join(__dirname, '../frontend/src/operations-registry.json'), JSON.stringify(registry, null, 2) + '\n');
+diff --git a/tests/operations-monitor.test.mjs b/tests/operations-monitor.test.mjs
+new file mode 100644
+index 0000000..0d49ec5
+--- /dev/null
++++ b/tests/operations-monitor.test.mjs
+@@ -0,0 +1,30 @@
++import test from 'node:test'
++import assert from 'node:assert/strict'
++import { readFileSync } from 'node:fs'
++import { createHash } from 'node:crypto'
++import { createRequire } from 'node:module'
++import { operationsRouteForGateways, linkedGateway, validMonitoringLink } from '../frontend/src/operations-monitor.js'
++const require = createRequire(import.meta.url)
++const { DEVICE_REGISTRY, ROOM_REGISTRY, FAN_REGISTRY } = require('../server/monitoring/registry')
++const registry = JSON.parse(readFileSync(new URL('../frontend/src/operations-registry.json', import.meta.url)))
++test('browser registry contains exact reviewed monitor IDs, not display-name matches', () => {
++  assert.equal(registry.sha256, createHash('sha256').update(readFileSync(new URL('../server/monitoring/registry.js', import.meta.url))).digest('hex'))
++  assert.deepEqual(registry.devices.map(d => d.id), DEVICE_REGISTRY.map(d => d.device_id))
++  for (const device of registry.devices) {
++    assert.deepEqual(device.targets, [device.id,...ROOM_REGISTRY.filter(r => r.device_id === device.id).map(r => r.room_id),...FAN_REGISTRY.filter(f => f.device_id === device.id).map(f => f.fan_id)])
++  }
++})
++test('unregistered and grouped gateways never choose an arbitrary factory', () => {
++  for (const ids of [[],[45482,45865],['新哨加工厂二厂'],['045482']]) assert.deepEqual(operationsRouteForGateways(ids), { path: '/operations/from-monitor' })
++  assert.equal(operationsRouteForGateways([45482, '45482']).query.monitor_factory_id, 'FAC_XINSHAO_2')
++})
++test('return links require exact factory, gateway and equipment identities', () => {
++  const link = { monitor_factory_id:'FAC_XINSHAO_2',monitor_gateway_id:'45482',monitor_device_id:'45482' }
++  const devices = [{id:45865,name:'same name'}, {id:45482,name:'same name'}]
++  assert.equal(linkedGateway(link,devices),devices[1])
++  for (const changed of [{monitor_factory_id:'FAC_MOUDING'}, {monitor_gateway_id:'45865'}, {monitor_device_id:'unknown'}]) {
++    assert.equal(validMonitoringLink({...link,...changed}),false)
++    assert.equal(linkedGateway({...link,...changed},devices),null)
++  }
++  assert.equal(linkedGateway(link,[]),null)
++})

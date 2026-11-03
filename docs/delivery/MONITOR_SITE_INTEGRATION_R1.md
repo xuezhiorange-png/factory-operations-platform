@@ -119,6 +119,21 @@ GitHub PR or SSH push is possible within this task's authorized boundaries. Its
 local branch/commit and applicable patch are delivered instead; this limitation
 must not be labeled a published monitor PR or deployment.
 
+Actual monitor source commit:
+`462c050cf55b743b03065bbe00c39c957682ff05` on
+`codex/factory-ops-monitor-portal-r1`, based on the exact monitor base above.
+It vendors the clean reusable-code commit
+`dba043667970e6019dbdc7a8420969d82411d090` (37 source files, per-file hashes).
+`monitor-integration-r1/monitor-bridge.patch` contains the other 15 bridge files
+for review/application to that exact real source. It is not an invented monitor
+app. First check the real monitor base and patch applicability; then export the
+pinned reusable module into the absent `frontend/vendor/factory-operations-portal`
+directory. Do not apply a patch to an unverified/dirty project or server.
+
+The final operations PR HEAD may include delivery-only updates after that reusable
+code commit. CI is required on the PR's exact HEAD, not inferred from the pinned
+module export or local monitor commit. No monitor GitHub CI is claimed.
+
 ### Remaining Gates
 
 ```text
