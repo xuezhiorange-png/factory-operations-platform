@@ -97,6 +97,14 @@ files are not source evidence and are not part of this change.
   HTTPS identity CI remains unchanged. No actual Feishu/Doubao login was tested.
 - Screenshots and browser measurements: `monitor-integration-r1/` alongside this
   document. No credentials, cookies or database connection strings are archived.
+- The first resize-adjacent captures (`mobile-detail.png`, `width-320.png`,
+  `width-768.png`) had compositor dimensions different from the requested DOM
+  viewport. They are **not accepted screenshot evidence**. Use `final-*` and
+  `screenshot-metadata.json` instead. Tablet capture height differs from DOM height
+  (1003 vs 1024); width/overflow checks use the measured DOM, not the image height.
+- A development hot-update briefly reset the module API namespace, producing
+  `/assets/*` route warnings. Namespace mode is now preserved in Vite hot data;
+  full-load/production routing is unchanged. This is not a hidden production pass.
 
 ### Export and Review
 

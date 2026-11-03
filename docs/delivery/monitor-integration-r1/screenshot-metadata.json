@@ -1,0 +1,62 @@
+[
+  {
+    "file": "desktop-detail.png",
+    "width": 1440,
+    "height": 960
+  },
+  {
+    "file": "desktop.png",
+    "width": 1440,
+    "height": 960
+  },
+  {
+    "file": "final-desktop.png",
+    "width": 1440,
+    "height": 960
+  },
+  {
+    "file": "final-mobile-detail.png",
+    "width": 390,
+    "height": 844
+  },
+  {
+    "file": "final-mobile.png",
+    "width": 390,
+    "height": 844
+  },
+  {
+    "file": "final-width-320.png",
+    "width": 320,
+    "height": 844
+  },
+  {
+    "file": "final-width-768.png",
+    "width": 768,
+    "height": 1003
+  },
+  {
+    "file": "mobile-detail.png",
+    "width": 390,
+    "height": 260
+  },
+  {
+    "file": "mobile.png",
+    "width": 390,
+    "height": 844
+  },
+  {
+    "file": "monitor-home.png",
+    "width": 1440,
+    "height": 960
+  },
+  {
+    "file": "width-320.png",
+    "width": 320,
+    "height": 693
+  },
+  {
+    "file": "width-768.png",
+    "width": 390,
+    "height": 844
+  }
+]
