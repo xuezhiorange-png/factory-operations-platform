@@ -9,6 +9,8 @@
     "business-tests/**/*.ts",
     "playwright.business.config.ts",
     "identity-tests/**/*.ts",
-    "playwright.identity.config.ts"
+    "playwright.identity.config.ts",
+    "portal-tests/**/*.ts",
+    "playwright.portal.config.ts"
   ]
 }

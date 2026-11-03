@@ -3,6 +3,7 @@ import AppIcon from '../../shared/components/AppIcon.vue';
 import EmptyState from '../../shared/components/EmptyState.vue';
 import { useRoute } from 'vue-router';
 import { loginTarget } from '../identity/account';
+import { isMonitorPortal } from '../../shared/api-path';
 const route = useRoute();
 export type ReadState =
   | 'loading'
@@ -20,7 +21,7 @@ defineEmits<{ retry: [] }>();
     <AppIcon name="LoaderCircle" class="spin" /><span>正在查询设备数据…</span>
   </div>
   <EmptyState
-    v-else-if="state === 'expired'"
+    v-else-if="state === 'expired' && !isMonitorPortal()"
     icon="ShieldCheck"
     title="登录已过期"
     description="平台会话已过期或被撤销，请重新登录后查询。"
@@ -34,7 +35,7 @@ defineEmits<{ retry: [] }>();
     ></EmptyState
   >
   <EmptyState
-    v-else-if="state === 'forbidden'"
+    v-else-if="state === 'forbidden' || state === 'expired'"
     icon="ShieldCheck"
     title="无查询权限"
     description="需要有效的平台会话与工厂授权。当前不会显示其他工厂的数据，也不提供模拟登录。"

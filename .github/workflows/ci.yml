@@ -137,6 +137,9 @@ jobs:
       - name: Verify HTTPS OAuth and sessions with synthetic Feishu transport
         working-directory: frontend
         run: npm run test:identity
+      - name: Verify native portal against isolated API and PostgreSQL (no production or SSH)
+        working-directory: frontend
+        run: npm run test:portal
       - name: Preserve browser verification evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,0 +1,17 @@
+# REVIEW-ONLY snippet for the EXISTING HTTPS server block. Not an install script.
+# Replace __OPS_API_PORT__ only after PR #10 audit, backup/restore verification
+# and explicit deployment authorization. Do not create/replace a server block.
+location ^~ /operations-api/v1/ {
+    proxy_pass http://127.0.0.1:__OPS_API_PORT__/api/v1/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # Personal operations cookies remain the sole web identity. Never forward
+    # monitoring Bearers or client-asserted user/factory headers as authority.
+    proxy_set_header Authorization "";
+    proxy_set_header X-User-ID "";
+    proxy_set_header X-Factory-ID "";
+    proxy_no_cache 1;
+    proxy_cache_bypass 1;
+    proxy_read_timeout 30s;
+}

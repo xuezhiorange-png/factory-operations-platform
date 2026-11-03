@@ -90,7 +90,7 @@ const record = computed(() => {
       query: { factory: route.query.factory },
     }"
     ><template #notice
-      ><AssetDataNotice :source="result.data_source" /></template
+      ><AssetDataNotice :source="result.data_source" /><slot name="monitor-link" :asset="result.asset" /></template
   ></DetailPage>
   <template v-else
     ><RouterLink

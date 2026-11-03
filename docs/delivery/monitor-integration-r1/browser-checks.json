@@ -1,0 +1,43 @@
+{
+  "viewports": [
+    {
+      "client": 282,
+      "height": 844,
+      "iframes": 0,
+      "nav": 5,
+      "rows": 2,
+      "scroll": 282,
+      "width": 320
+    },
+    {
+      "client": 722,
+      "height": 1024,
+      "iframes": 0,
+      "nav": 5,
+      "rows": 2,
+      "scroll": 722,
+      "width": 768
+    }
+  ],
+  "desktop": {
+    "width": 1440,
+    "height": 960,
+    "client": 1378,
+    "scroll": 1378
+  },
+  "mobileDetail": {
+    "width": 390,
+    "height": 844,
+    "client": 352,
+    "scroll": 352
+  },
+  "personalSessionRequired": true,
+  "crossFactoryDenied": true,
+  "crossFactoryRows": 0,
+  "personnelRowsForGroup": 5,
+  "unmappedRows": 0,
+  "iframes": 0,
+  "pendingIssue": true,
+  "logs": [],
+  "source": "actual monitoring App.vue + native routes; loopback synthetic API/PostgreSQL16"
+}

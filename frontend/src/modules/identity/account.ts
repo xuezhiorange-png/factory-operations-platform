@@ -1,5 +1,6 @@
 import { reactive, computed } from 'vue';
 import type { Factory } from '../assets/contracts';
+import { isMonitorPortal, operationsApiPath } from '../../shared/api-path';
 
 export type Role = 'group_lead' | 'engineer' | 'factory_equipment_admin';
 export interface Account {
@@ -36,12 +37,19 @@ export const accountLabel = computed(
 );
 let refreshGeneration = 0;
 
+export function clearAccount() {
+  refreshGeneration++;
+  account.user = undefined;
+  account.status = 'anonymous';
+  account.selectedFactory = '';
+}
+
 export async function refreshAccount() {
   const generation = ++refreshGeneration;
   account.status = 'loading';
   account.user = undefined;
   try {
-    const config = await fetch('/api/v1/auth/config', {
+    const config = await fetch(operationsApiPath('/auth/config'), {
       credentials: 'same-origin',
       cache: 'no-store',
     });
@@ -50,7 +58,7 @@ export async function refreshAccount() {
     if (generation !== refreshGeneration) return;
     account.configured = capability.configured === true;
     account.synthetic = capability.data_source === 'synthetic_test';
-    const response = await fetch('/api/v1/auth/me', {
+    const response = await fetch(operationsApiPath('/auth/me'), {
       credentials: 'same-origin',
       cache: 'no-store',
     });
@@ -99,7 +107,7 @@ export function csrfHeaders(): Record<string, string> {
 }
 
 export async function startLogin(returnTo: string, channel: 'pc' | 'h5') {
-  const response = await fetch('/api/v1/auth/feishu/start', {
+  const response = await fetch(operationsApiPath('/auth/feishu/start'), {
     method: 'POST',
     credentials: 'same-origin',
     cache: 'no-store',
@@ -118,20 +126,18 @@ export async function startLogin(returnTo: string, channel: 'pc' | 'h5') {
 }
 
 export async function logout() {
-  const response = await fetch('/api/v1/auth/logout', {
+  const response = await fetch(operationsApiPath('/auth/logout'), {
     method: 'POST',
     credentials: 'same-origin',
     headers: csrfHeaders(),
     cache: 'no-store',
   });
   if (!response.ok) throw new Error('Logout failed');
-  refreshGeneration++;
-  account.user = undefined;
-  account.status = 'anonymous';
-  account.selectedFactory = '';
+  clearAccount();
 }
 
 export function loginTarget(path: string) {
+  if (isMonitorPortal()) return '/operations/access';
   return path.startsWith('/m/') ? '/m/login' : '/login';
 }
 export function internalTarget(value: unknown, fallback: string) {

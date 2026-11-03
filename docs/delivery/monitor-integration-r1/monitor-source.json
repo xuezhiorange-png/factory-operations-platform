@@ -1,0 +1,871 @@
+{
+  "base": "91b686a313e2f73e0fec9459404ac8ef2b3abc19",
+  "copied": [
+    {
+      "path": "frontend/factory-spaces/xinshao/index.html",
+      "oid": "0b9d72b58099b8fa76044e4a25bd05e97f952d91",
+      "sha256": "186d7648b1a45934fef23a2cbedb3f13f65694f4250f47903222650c0cc94fef"
+    },
+    {
+      "path": "frontend/index.html",
+      "oid": "0dda24d5bff09aeabf157cae6d9f1bce8541ffad",
+      "sha256": "eceb4fca8cff9b64e34585b74f5a97f03aaf652e05e46df03bf6892647f97bbd"
+    },
+    {
+      "path": "frontend/package-lock.json",
+      "oid": "80992cbed4e2e412f232469932d2096e1665d1df",
+      "sha256": "48471b45d8d2f8f2985cdbf91709f3ee22d9043bd20ea5bc1136e2d3ee2bf713"
+    },
+    {
+      "path": "frontend/package.json",
+      "oid": "26e5af3c458861550963b2adf81e35fdeb454a08",
+      "sha256": "efd10a60ecd952ec5831b2e79016a7ea0ad4330942a5c744b6c2d1a08b31abc8"
+    },
+    {
+      "path": "frontend/postcss.config.js",
+      "oid": "cb9b0aaa5bdd67441f1cf7d4d6f6cbdba7ba8d24",
+      "sha256": "6f28f3c50de275cc76c08e0ca499b369ddd2cdea50563f023a2e60e6503f3144"
+    },
+    {
+      "path": "frontend/preview/SpacePreview.vue",
+      "oid": "9c8e6dfc6aa6b267601670ffa523b663718c67ec",
+      "sha256": "270c59b0e6ebc1b394a8ae7a17d9056866f22896f85d50ca5a989a1de0346f16"
+    },
+    {
+      "path": "frontend/preview/fixtures.js",
+      "oid": "0c518a7940d9e8c24086632a8fb2b7e70b595a96",
+      "sha256": "962311d99342e23a0ce01e97df3eb47a83a86bbc9c54bc752d7f43a16e414beb"
+    },
+    {
+      "path": "frontend/preview/space-main.js",
+      "oid": "758925b4d14c94d79d07b7a85bb7350dc6927a60",
+      "sha256": "e6706cd8582a5ad9eb3808780352d8087dccb0fdf9b6fcf51e4519d499cacc83"
+    },
+    {
+      "path": "frontend/preview/space.html",
+      "oid": "f1d299e1b64a1d073bb2e513289f4737e4f7161d",
+      "sha256": "2ae10f5f0f43d44c625952f6bf4fb13b362b60e76b29c4c3eecb0934e771254b"
+    },
+    {
+      "path": "frontend/public/assets/monitor/graphite-relief.jpg",
+      "oid": "a417209260cc855057919a3da0e171a4c65f3326",
+      "sha256": "a0d9172c0ff1ef9c006392c977ec48d1c2ffd692c7a6083108a4eff26404f102"
+    },
+    {
+      "path": "frontend/public/assets/monitor/spatial-ground-v2.jpg",
+      "oid": "e9a4a4a9552f7d4e5467ef307476126f9e2601ed",
+      "sha256": "c917a590d6180c3258724e225c7017dc462fe32b6cd8088003f3ecd1891ca912"
+    },
+    {
+      "path": "frontend/public/blueberry-orchard-hero-v2.jpg",
+      "oid": "425b6b15c8841726ce8216a3e919fd8ce86f53ff",
+      "sha256": "5e000e90eb5b4eb28612e710956b1881d99608239a1b61bc748a6a727664aed0"
+    },
+    {
+      "path": "frontend/public/blueberry-orchard-hero.png",
+      "oid": "eee25bff9b4f36043d66263fd17a30f2da4d11b0",
+      "sha256": "3ef39e5f65cd807654dd888013fbeeb6862487b64344c1f7fd1afc73d317a3e7"
+    },
+    {
+      "path": "frontend/public/blueberry-reference-header.jpg",
+      "oid": "750adbbe30d2346ccb44fe6cd0ab66067ab00b93",
+      "sha256": "fa614415e8932b569d5c8620cd121cf23c5d4bd899669212fe4635bdc6023abc"
+    },
+    {
+      "path": "frontend/public/fonts/Barlow-Latin-400.woff2",
+      "oid": "abe9138cbc400c19c8aaa8649c8e847b7ae849c4",
+      "sha256": "7a686e76312866b7d506c103e51a829d4c96a0b4576835128d3b7b53801c095a"
+    },
+    {
+      "path": "frontend/public/fonts/Barlow-Latin-500.woff2",
+      "oid": "1938026ad48b913f3d1ed9f41f29d972aa93d5cf",
+      "sha256": "80e7dc5605dd451bb9b092d7f46704f08bf39d2866cb981aa8caddc016716aed"
+    },
+    {
+      "path": "frontend/public/fonts/Barlow-Latin-600.woff2",
+      "oid": "124f808a1050e651fbf32a3ab05d0c35a36b4644",
+      "sha256": "488b58098126c00b8fa77f4d58b0a4bc982e81e4c83323c1a73d9f1a67c15971"
+    },
+    {
+      "path": "frontend/public/fonts/Barlow-OFL.txt",
+      "oid": "2f22ba6ca4dbc12145ae40b14c3368f387cba0e2",
+      "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f"
+    },
+    {
+      "path": "frontend/public/logo-v2.png",
+      "oid": "0646ee503fc092886b2c529e0eaa4da1ff2b0333",
+      "sha256": "219d6cc5d406f856910a0c0d76b3caeadc6a6b285d7637586d4a2d98a560ad8b"
+    },
+    {
+      "path": "frontend/public/logo-v2.svg",
+      "oid": "81a1ddb9ea90dc5d39bc503b7b59041dd8fef350",
+      "sha256": "5e16793a95ee1109e3df7f81dec4e16999f2f4ab21444cb9029979743536029a"
+    },
+    {
+      "path": "frontend/public/maps/terrain/provenance.json",
+      "oid": "fc4528cf689e52bd8520e8a80b4650519f4bec05",
+      "sha256": "c88952723b01890ecd2e7a702c551dbfc096eb98312aa3d112dff0c28603f9e9"
+    },
+    {
+      "path": "frontend/public/maps/terrain/yunnan-height.png",
+      "oid": "999825444d618394172213f2c58636d5a8acaa0c",
+      "sha256": "5851e9808d4ee34046d71ec2b99fd2539c4c2cdd3f72b9bd31c369e02d6b5901"
+    },
+    {
+      "path": "frontend/public/maps/terrain/yunnan-normal.jpg",
+      "oid": "f2a24610da07ba3dc35f1212072e16ed2057a52e",
+      "sha256": "49f4ec714441356ca1df601506db3df312b25e0e5bf5f17bd7dad658eb31137d"
+    },
+    {
+      "path": "frontend/public/maps/terrain/yunnan-surface.jpg",
+      "oid": "00461e42929c22646a729fd0f319005724bab461",
+      "sha256": "bb4525df32b594d27da2c92a5c971f29340c79c0fb3824d9393b4938a17c44c3"
+    },
+    {
+      "path": "frontend/public/maps/yunnan.geojson",
+      "oid": "c8dc083d40043b47f7254c8f95df2f7df76d5d7b",
+      "sha256": "c11c7adf7581fc53e965bf0fd2b3217213f118c59ebddf4cab929c51ee00aa6e"
+    },
+    {
+      "path": "frontend/public/units/compressor.webp",
+      "oid": "dae1b0226a1525b01bf7fc498eba3bb556c6a6af",
+      "sha256": "d64c75443b97e4ff24557d1f03c800a6a51eb6b8d1e04c5c592de11904ce18a5"
+    },
+    {
+      "path": "frontend/public/units/evaporative-condenser.webp",
+      "oid": "3374395d644fb2f36e572003445154421c55f55e",
+      "sha256": "df21595b7efebf7a8df46ce97721951b4b80a2931028dd56864f461864bde0c4"
+    },
+    {
+      "path": "frontend/public/units/evaporator.webp",
+      "oid": "0a291e29352ab313a172582b46306aa31f5ce9d2",
+      "sha256": "bdb5286dc99c69adf8e5eaec17c55f908950468043447dfc04517667e2c22a45"
+    },
+    {
+      "path": "frontend/public/units/oil-separator.webp",
+      "oid": "1382c3527b9acb6b01420f3a2b72f1afb936d744",
+      "sha256": "26927d2cc08e3a93d37f5f88ccfd1ec41b8cdd5cf93a46f00993f407363c8cb7"
+    },
+    {
+      "path": "frontend/src/App.vue",
+      "oid": "830828166daf84e25315be1888d2581551947e20",
+      "sha256": "db68f89d340ed49709ea6e71d9b8b78bf28912215b244721dadaa9a8e4c32377"
+    },
+    {
+      "path": "frontend/src/api/index.js",
+      "oid": "72fc3b139ee77d363c6af8fbf2ef85b113e670a0",
+      "sha256": "da2afda43365f5a034ac6f9d22ed663ff8fd0f3d843feba2f0f70643dd965f88"
+    },
+    {
+      "path": "frontend/src/components/AppIcon.vue",
+      "oid": "8d35fa1fe752c9abdc4eb56005b3f5a0241dc8d9",
+      "sha256": "f6b760facdd1c8c2bceae64be91baff73083b13745f2af1af92be2e48e89d650"
+    },
+    {
+      "path": "frontend/src/components/ApplicationShell.vue",
+      "oid": "22462d5965ba4ec7f33b0157f6cb623352693af0",
+      "sha256": "df6264c51661fc3142c400c0533429b058cfe452524dd80d1007141b09735a0b"
+    },
+    {
+      "path": "frontend/src/components/BrandWordmark.vue",
+      "oid": "a8b507b2647ef06231bf106dd5fa7baa87e6aeb2",
+      "sha256": "046a3c551a5c7ad70d12e01b4c7d6bcf3f82716d6c763f8e21cbc7d99f2091e5"
+    },
+    {
+      "path": "frontend/src/components/DeviceModal.vue",
+      "oid": "948c8abb7b562fd0cbea00470ca51d1614bb0496",
+      "sha256": "844f3830a43754ea3dc76e4a5d6caf431f4434a5e51c3e279eb04f15ed754c39"
+    },
+    {
+      "path": "frontend/src/components/EnergyTrend.vue",
+      "oid": "5cae0522afc98b6e499d17c7bd896438aef01fa2",
+      "sha256": "e76eef3ccf2312418236f578fc57aa7455e072bc315c31c8447570dc400190ac"
+    },
+    {
+      "path": "frontend/src/components/FactoryMonitor.vue",
+      "oid": "9bc9d7838920395b1a4c6a3f88a712bd00a4b2c8",
+      "sha256": "eed4d6f9e6dc3c2ea83a5f1748305788604c6cee7290f6dc56d948169d555deb"
+    },
+    {
+      "path": "frontend/src/components/FactorySpaceView.vue",
+      "oid": "979bf1461a68e630ec438d99cb0f7d37882c7b12",
+      "sha256": "62337d528364c656ae74359975efbf2ea3bd50077b5c9b36f9529bfbcfb7ff27"
+    },
+    {
+      "path": "frontend/src/components/HomeEnergyTrend.vue",
+      "oid": "3694d26e1aaaa813cc2b7f727ea1fcd56845817f",
+      "sha256": "bd6c4d3dc246529cc8adf61e45213b86886ffb24f54933c37da75dcba23309b5"
+    },
+    {
+      "path": "frontend/src/components/ManagementMenu.vue",
+      "oid": "443626862642c3d4430b0966a312170f4993c96e",
+      "sha256": "7fa1fbee29ffb35c2fb938dfd03ce0532e32722164003e44fc279c4593aaf08c"
+    },
+    {
+      "path": "frontend/src/components/MobileNav.vue",
+      "oid": "133fa9c4f93bf663f738d20f0cfd50b64ff5a2e4",
+      "sha256": "c97d13a01eb9424a66d972778585a0ef00603db12ff3c4271572336e924001c9"
+    },
+    {
+      "path": "frontend/src/components/RoomTemperatureTrend.vue",
+      "oid": "441c5b9629ae89a0fd1bf2270bdb72487942b157",
+      "sha256": "b34da1347116cb87c37741bd5cebe3605672a1c15ec5dbe3eb77ce8575bb7140"
+    },
+    {
+      "path": "frontend/src/components/Toast.vue",
+      "oid": "acf2f379b3c847f292ef7c12bac97d8e2cd6143b",
+      "sha256": "706abe32045f590a553a87effcd054620816822c73835dbe755a91ae8db1f7c5"
+    },
+    {
+      "path": "frontend/src/components/UnitCircuit.vue",
+      "oid": "3f509bcd37de9ff27f2cd12f011e41310c9e9e57",
+      "sha256": "e3e3981f758a9173cf86224c39d785f28baab6df24a6b28400599e91029ec813"
+    },
+    {
+      "path": "frontend/src/components/UnitOverview.vue",
+      "oid": "d083ab32e6f66d60caee0d9b0e5ceb40e03627ab",
+      "sha256": "ff8c1439fad0dc5b34e2fa6783ad57f6137f1237813f401ff330aa0c931e42a1"
+    },
+    {
+      "path": "frontend/src/components/UnitPanel.vue",
+      "oid": "aaec094e0dd960c8fec3ac7c35ea2891f2f8ed45",
+      "sha256": "bd351ea3322538db1eb6ba6cab0949afbb2cf88f9a116a717bc2c90a07d6f2ad"
+    },
+    {
+      "path": "frontend/src/components/UnitPipe.vue",
+      "oid": "b9867145ea1757eea3855a775bb7772930445e9c",
+      "sha256": "6caf99e1dc7d5311b53c5999e177c5168dc1e62a23eb25767a050398c40dbb2d"
+    },
+    {
+      "path": "frontend/src/components/WorkspaceHeader.vue",
+      "oid": "f44139c091a9da2a0ee47b430e3005344a294137",
+      "sha256": "7c55c8a1d11f9123510fd502bdc959b99b43b867708f759df8d618105f1748ff"
+    },
+    {
+      "path": "frontend/src/components/YunnanScene.vue",
+      "oid": "c03872f15338da8c37c375c266ce3d47ed4d6f06",
+      "sha256": "fc2c29ca819f7523840a19ba06f7a15437283b8e17597a311cffaf0845571597"
+    },
+    {
+      "path": "frontend/src/data-contract.ts",
+      "oid": "00b2e16949311dc1fa83df3798c6b0e1a046ce9c",
+      "sha256": "77086bc2ef8edda919396a007b0147292e2f4753f6882fb149b4998d931f5259"
+    },
+    {
+      "path": "frontend/src/energy.js",
+      "oid": "73779dd4e39332bee8532192c15ee6351c330454",
+      "sha256": "e2e639a3ecf0b20c48b24883b7c77818e65944dcfb61439ae7681ee4279369d2"
+    },
+    {
+      "path": "frontend/src/factory-locations.js",
+      "oid": "e6a08f556d9cc4ff442abc922971cad0b20fed23",
+      "sha256": "81760c1cc8369f7ba8ce1508cac402ade786a2fdf2308b47f2871d8503f40536"
+    },
+    {
+      "path": "frontend/src/factory-row-layout.js",
+      "oid": "2250644503da98a3893907f0bbab17dce9549cdc",
+      "sha256": "7488a31cddbf00386faaf3bb9fe41047f3bcb128d10c47848e07ff52accbdbe2"
+    },
+    {
+      "path": "frontend/src/factory-spaces.js",
+      "oid": "37d5aa10583423e6a714534f2576484359157db4",
+      "sha256": "3cec07b2f541d8d8f9ffcb570e9277a49b1b2ca2d02e81038ec20e39325fe7c6"
+    },
+    {
+      "path": "frontend/src/home-inspection.js",
+      "oid": "35b6b8ce696c1a6d09b108a22d153d4001f392bd",
+      "sha256": "9c640305b7937f99c73f7eef5f56bfe8d800e6e4ff0fff3756f04daf149ec599"
+    },
+    {
+      "path": "frontend/src/liquid-glass.css",
+      "oid": "2ac56ea5da8864ecea9a9752c6796f2eecc0c6dd",
+      "sha256": "90c2a0a0628569e471f5eb911b05c5dc6e5e2c214623133b7a41debf8c811220"
+    },
+    {
+      "path": "frontend/src/main.js",
+      "oid": "7180ce91cb8aa3c39b212fab56d5958b0305c528",
+      "sha256": "ab45bc418abb17ba8af5474a5f5a50aa56800a943ef360a57a34031da71a5763"
+    },
+    {
+      "path": "frontend/src/map-projection.js",
+      "oid": "63ade8eeff8c8d7af5060b99b75edeaff21220f0",
+      "sha256": "f8dce3ce274c3bba9733afe0890e88cb9990e2d1f85cdeeac95632d82ec43280"
+    },
+    {
+      "path": "frontend/src/map-terrain-geometry.js",
+      "oid": "20a6df22cc4d645d7ee64f24faeb2cd3e04d1963",
+      "sha256": "95507269b3f7fad3ba37b14a2df6f1b8a13b2ad8f971eb2eaff38cf9fe9f9941"
+    },
+    {
+      "path": "frontend/src/map-terrain.js",
+      "oid": "53e7335d2b104e4b9c5bc329263e66dae8037941",
+      "sha256": "2df3c37366488f9642b3139478b700f212d6cc7af08027d47c23eb44b76d4505"
+    },
+    {
+      "path": "frontend/src/navigation.ts",
+      "oid": "0d57a9b71b1cda2cb0f1e857b0cd9ea4715d0120",
+      "sha256": "7c389aedee36f11d2bc6c978036578e40b5f96bbea27d3d699a8eec4649a2e85"
+    },
+    {
+      "path": "frontend/src/room-inspection.ts",
+      "oid": "a7da358f3c8f3edb5456cbed9df33f3717b67ccf",
+      "sha256": "29eb5e73fb31fa2db4d56548b7a72933dc2ecf8439aad7c9629294975e6da17c"
+    },
+    {
+      "path": "frontend/src/room-temperature-history.js",
+      "oid": "e3bcfa69d2b8f052c61c157cbe3bf01c3b99db70",
+      "sha256": "4084611eff3f826d9fb11719530f1ad43bdf61648396d34a6dd528a9c90b2689"
+    },
+    {
+      "path": "frontend/src/router.js",
+      "oid": "859aeb84c9208b7ce3f04714cb214bd1fd98d4b7",
+      "sha256": "bbde1d348d8af716431d9c9498bdc2afc46672ae60f508e3ea4b78687554e029"
+    },
+    {
+      "path": "frontend/src/sim-cards.js",
+      "oid": "d8af95e3e717da59826e9ec6689b1ed85a34082b",
+      "sha256": "55a7c92ce87d4eebb72665e73084ec7dbd5dbf03361dc1f3888dfde1703ed55a"
+    },
+    {
+      "path": "frontend/src/site-overview.js",
+      "oid": "32de145205f1b7b1d4e6f517eafeeb8aabd1c710",
+      "sha256": "707e4811cb252dc2166695a03e897d2879c9970bdfa015d9841391aecfbb38d7"
+    },
+    {
+      "path": "frontend/src/spaces/xinshao/SpaceEntry.vue",
+      "oid": "43a2f1effb1f50930c1bdb9905f2428495386cb5",
+      "sha256": "805d2be7f043f4f5e2a87d39a254559d3303282068f3d7d426caef96c01a40f1"
+    },
+    {
+      "path": "frontend/src/spaces/xinshao/main.js",
+      "oid": "78863bd346078c55baaa3b4dd52a81edda0077bf",
+      "sha256": "835a7c38e8ef2a9a10cbc3554835f4854ab41e58a33b2cdfa09abdac2f81fcc2"
+    },
+    {
+      "path": "frontend/src/stores/auth.js",
+      "oid": "37adbe26b6bdd1d0a8a581a5e1b1d0d5a910d75a",
+      "sha256": "195a87e42893562bfc79f29fdcd0d040ea4e0c750a940d9b7226a3f1d8dfa384"
+    },
+    {
+      "path": "frontend/src/stores/data.js",
+      "oid": "99914d58e3232a96f5a0d8627e7cc9b23bf178af",
+      "sha256": "38cd67c76ae0c4c9288b709a36a9224e56758b586c2544996e7f7e341eeac890"
+    },
+    {
+      "path": "frontend/src/style.css",
+      "oid": "c722c4fd60d37966bf7fc21b0fdebbf30da45643",
+      "sha256": "0dccf5dcacdd840d20545938b03b3d4f6f0c7ab2d7002b2f0ca325e72e95e222"
+    },
+    {
+      "path": "frontend/src/styles/app-base.css",
+      "oid": "fad543a66dd7124221014e8dc2261debdebc0b4a",
+      "sha256": "f6097429156948e939086d28283284a62c5d3a03f45d9771a26359640d4d4679"
+    },
+    {
+      "path": "frontend/src/styles/dashboard.css",
+      "oid": "e0a7cc88d71d4af2744fa0a3ff78597f3059cd04",
+      "sha256": "cfb15e891bd82fb9ead7467deb47ec18ccf9127d6b7b8b60b6f15c208fcab8f7"
+    },
+    {
+      "path": "frontend/src/styles/factory-monitor.css",
+      "oid": "c40a3296e0b3c15b4d2ad8ee957ab45e25fea8e6",
+      "sha256": "bc54a24a97052f07ede156660f923c872a46c54da6a1777f17f5b66dcda1238c"
+    },
+    {
+      "path": "frontend/src/styles/industrial-type.css",
+      "oid": "d40b309c57401786034d1bb396b15e042d805a51",
+      "sha256": "5e6018d91f24300ccdd097ea6bae6a395c46389412a790ce0828c14d00d35ae4"
+    },
+    {
+      "path": "frontend/src/styles/industrial.css",
+      "oid": "b43fa6f62deff285946fa818d4003cff0f314dd7",
+      "sha256": "7754f7be64e406f2a9c96a5c02b11ee30a2d6a0d969df308edeee96fa8422ee5"
+    },
+    {
+      "path": "frontend/src/styles/mobile-home.css",
+      "oid": "5540cf9bc9bd54a3ce9742d6264c70ea737184e4",
+      "sha256": "e673bdf8e18978b79c53c0480cbbc3629b073b2db22eb437a7a8c3aa78cea006"
+    },
+    {
+      "path": "frontend/src/styles/mobile-nav.css",
+      "oid": "0267318d7cedecace1ea51b6027e5af2ef69dd2e",
+      "sha256": "25a2a70399e2bf76f6d07753c2ac9a86f7ab2384b67471bdc92cfce3d52668d4"
+    },
+    {
+      "path": "frontend/src/styles/reference.css",
+      "oid": "15f43be88899148d7fc66cc6d109af510185c9a9",
+      "sha256": "416511b9156b2ba128339bd44098f6a9fd2e2411fe3ee46449cb3b7c3d644cfa"
+    },
+    {
+      "path": "frontend/src/styles/refinement.css",
+      "oid": "fc636f872bf663d8f6b2c61afa959d39e9308a34",
+      "sha256": "6760e7190aaf67fef36ae07c6602db23c8ad66ad2782527634946d14388083e6"
+    },
+    {
+      "path": "frontend/src/styles/responsive.css",
+      "oid": "396c2f48b53ad85ba3670a830d07f6251646a53f",
+      "sha256": "260d6af9fb8645437298817d873012b39c05e45ebf7675cd0b63144c4d44e723"
+    },
+    {
+      "path": "frontend/src/styles/spatial-dashboard.css",
+      "oid": "003ae68675993da3ea6192bddb028729a8f259ab",
+      "sha256": "a4205fa175384ad01a9facd0c239c3676198abcd91d6efd16c9337e7d89c94a4"
+    },
+    {
+      "path": "frontend/src/styles/subviews.css",
+      "oid": "ecb43bb72830c382c88c883a26c0823ac8b1a88e",
+      "sha256": "cb7b71b625d338630a8a84a6c2ad8a549d5d9eeb07fc3a8e3ab28af62a52f59f"
+    },
+    {
+      "path": "frontend/src/styles/theme.css",
+      "oid": "23a6d59cc2b2b480db05cf659b4bf1db85fa9a9b",
+      "sha256": "d398074ac6da6d9d150b04e435d3f1881d89feacbe4abf5acba4ae72ca7e9126"
+    },
+    {
+      "path": "frontend/src/styles/typography.css",
+      "oid": "039d91de8d4c5abf260caae1b1278e862ceeb1bb",
+      "sha256": "c2dac35e030cd99132ca57c4b2898fc4132f6fd44ffb6bb411d009c136afae9d"
+    },
+    {
+      "path": "frontend/src/styles/unit-monitor.css",
+      "oid": "8ca1c7c6ebe8495134a983d2ea30cca41dac2928",
+      "sha256": "0395e21f38e463fdf2f921bf027571200eb09ec44e3ec2c9341c6e1dfeac0954"
+    },
+    {
+      "path": "frontend/src/trend-data.js",
+      "oid": "9d35d35d1c25a944f9f5af159cf82ef5d2b16bd0",
+      "sha256": "58d46a375941398048370d7cc843bf259478733744327a283c85f05534ef3cc6"
+    },
+    {
+      "path": "frontend/src/types/monitoring.ts",
+      "oid": "a98dbf06eaca155500d203f98fc325ce936f3e5d",
+      "sha256": "27172e512bd90c45d2219cdcf6903ae175561637be923de8ab143fa2b3830567"
+    },
+    {
+      "path": "frontend/src/unit-inspection.ts",
+      "oid": "030daa8aeda165d96f4636a70ee5db7f1aee53f5",
+      "sha256": "82ee3b5a8e6f61d733b0469a313df7d62e584a25da5f3aa8c0e80b8bbbff1bc5"
+    },
+    {
+      "path": "frontend/src/unit-topology.ts",
+      "oid": "d96a965eef4569a1e4b169e5234ddb7b8c532c52",
+      "sha256": "724a6a9a5962addb2af30ab3ad3077a9b66ca62c55cfcdf6103d6a142f80ff62"
+    },
+    {
+      "path": "frontend/src/utils.js",
+      "oid": "e303f51f95e6185517f61a5417d4210a7ed32fcf",
+      "sha256": "e54e943e3115d092892a958a47e9e29492f378ca02b64303f2e674b3003102b8"
+    },
+    {
+      "path": "frontend/src/views/ActionLog.vue",
+      "oid": "8c8c7b8fec7639fe4080e78cee7b6ba78852e95f",
+      "sha256": "37dba5b82c33ea8018b2c05e433b58bb2a66ecca05579c6e350f67434cce3783"
+    },
+    {
+      "path": "frontend/src/views/Alarms.vue",
+      "oid": "45a2afe396ee7becf6c5c78092404aa8e885fd1e",
+      "sha256": "aa17de4e8804b1de9278b5cadba0957167233d924eea79128c96bbdd5b79bcb3"
+    },
+    {
+      "path": "frontend/src/views/CommandCenter.vue",
+      "oid": "50b603a417138134197de699b4f65c2301d80417",
+      "sha256": "cc49d8121ac2eb4d572da95728c9d151893191e710400bcb86aa73855e3a2e2d"
+    },
+    {
+      "path": "frontend/src/views/Dashboard.vue",
+      "oid": "6b6340c4330d16a41bc0e9993087c26b3568cd81",
+      "sha256": "21fcc9ca6d59981de66f026ab383a5591ae52aff196a9835c01b8ff4ee2e22a2"
+    },
+    {
+      "path": "frontend/src/views/DevLog.vue",
+      "oid": "32d719c6ee5e068fef8b8af5c72519f15afb1f8c",
+      "sha256": "550be952092faff681e73c532d8130d79ef7190b315beab59e3932be2031a53f"
+    },
+    {
+      "path": "frontend/src/views/Devices.vue",
+      "oid": "951cb31d2a37ce97503339aa87fcac1188f7e2d2",
+      "sha256": "3c7efe43415dac2c7986e6a807a943766baa8e0204af1432dcf6cfe66123015a"
+    },
+    {
+      "path": "frontend/src/views/Power.vue",
+      "oid": "1e6443c5daa823ff04bfacdab4b6f65598c412af",
+      "sha256": "ab18103dc7106aac6507f3d6b8bbb831de75806a95bea76d20afb56842ec2854"
+    },
+    {
+      "path": "frontend/src/views/ReferenceHome.vue",
+      "oid": "4a5cefc6d60c5e29e98077857dfccabf0eae97fe",
+      "sha256": "e663a2ad9ce65cc1a51ab8389480a394bfe41effebd8f828cc0d26d83408c3cc"
+    },
+    {
+      "path": "frontend/src/views/Report.vue",
+      "oid": "4d132c9d498c566036dcf2808184874d2408da46",
+      "sha256": "87a049a2249c37fc87e000f8e67ada2f2190e7b6c684fe1ff47a68869ddd3f63"
+    },
+    {
+      "path": "frontend/src/views/Settings.vue",
+      "oid": "d0c9e0ea2d80314244b3559b4c65cd2c81d01b02",
+      "sha256": "be6ed0f581857c40e7f3892679ff9e65ddecebd0662364bbeef42d1aa5c34b0c"
+    },
+    {
+      "path": "frontend/src/views/SimCards.vue",
+      "oid": "e00ee5201403664799639a36e6d53d9049a7d3de",
+      "sha256": "680a7e5567530876b9f7f3041b30e10d5c63fc4519d0956e2d0dae2add45edd3"
+    },
+    {
+      "path": "frontend/tailwind.config.js",
+      "oid": "94bd0d8472da2f496e86a29cbb273326d8d4952e",
+      "sha256": "3274a15f9dc60bde4c3301f773bd78d002b4b411eff14994cfc36627fe09a0cc"
+    },
+    {
+      "path": "frontend/tsconfig.json",
+      "oid": "021a843ad6ec7ba10eebbce7e68419f2c14db00d",
+      "sha256": "535dafc30935f938193f43abc0261d02155a8e8cdc8d9d378932dfc4cf2b23d8"
+    },
+    {
+      "path": "frontend/vite.config.js",
+      "oid": "843f1f2367a0913e6a4a811d42f5198bc37e0669",
+      "sha256": "b25f5dbe715b6bbc3309e033bdb6768c7619569b3fe6b3c59400061cc6f6ab94"
+    },
+    {
+      "path": "package-lock.json",
+      "oid": "30d57e80e5cb88ff52596b3fe21890a77eedbce8",
+      "sha256": "1a5fc94536f15b8ddd0736db826bc7f1b87953fb02f11c94254bdd0c9c2bc444"
+    },
+    {
+      "path": "package.json",
+      "oid": "bb586981cf792260570b691ba893ff244d85b8e2",
+      "sha256": "0faffb0c0262425a083278247631bee191a49faa0aadeb7164fc4c44d947df12"
+    },
+    {
+      "path": "previews/xinshao-twin/public/plan.png",
+      "oid": "49f0a62a8cabe1da98b4ef0ac53f8904e653aa38",
+      "sha256": "f175679474505254b19e2a5d05fc89c463b84f859760849e5c976bb7191e6300"
+    },
+    {
+      "path": "previews/xinshao-twin/src/App.vue",
+      "oid": "e6cae137e283aae7c8a62476524b6201cecef983",
+      "sha256": "d602b3c2028b927dc96eb9b9bfb3df66f7432014e8772b23ff9c0abdc99b72f7"
+    },
+    {
+      "path": "previews/xinshao-twin/src/geometry.js",
+      "oid": "6d1de2e16467e7d4cbce2c5b877704908cacd538",
+      "sha256": "ea6f935494a0cddafa82ad66a2268eb27da1de3f969b7223f55d996f7af8ba2e"
+    },
+    {
+      "path": "previews/xinshao-twin/src/main.js",
+      "oid": "fe5bae398bf7147490e7f9c3b7802f05a12938db",
+      "sha256": "0d42fb6bb74a51d647f20a0cd2bcdcc7b89b146f4cdfbf6f1f7b640e7e036119"
+    },
+    {
+      "path": "previews/xinshao-twin/src/plan.js",
+      "oid": "60d9be441e1ab93b7907c03ec783b810228783d8",
+      "sha256": "9cc5d3a2d3533c32ab8f516547dbe3f3a8a84d81069fb378042875087f3445b4"
+    },
+    {
+      "path": "previews/xinshao-twin/src/scene.js",
+      "oid": "bcca1c67b6866902e9050bab2849a626b877b285",
+      "sha256": "277cf20b7531f1bf402f2461a53bac26494b37e1558e8be1c1abe4112f04c0eb"
+    },
+    {
+      "path": "previews/xinshao-twin/src/style.css",
+      "oid": "d39dbbef5de812030073a0fd7eba78ebc71b60a3",
+      "sha256": "f49c5e32acc670b111899c85ea8f9fcb363daf4403378eb61c8c4fefc17911fd"
+    },
+    {
+      "path": "previews/xinshao-twin/tests/plan.test.mjs",
+      "oid": "12a6e309aa32fbb5f4e3bc84c8864d4ba45fcb35",
+      "sha256": "2b8afa81f409e590467a7ecee0abdd20bae4978e37653713f38b06a48984eae3"
+    },
+    {
+      "path": "server/config.js",
+      "oid": "54655492f21510c4443537183c7866f276c26271",
+      "sha256": "4193c4b3fd4e194ffcde72b2e1ee25b806f5136505365b5daf5c3e18f8ebaa63"
+    },
+    {
+      "path": "server/db.js",
+      "oid": "0c7c0f2db35c5cb4f16e32f90d31d0e1497324b6",
+      "sha256": "f817992faae3ff2ea3af89958a25a69649b3fa5930eadfef57a695bb4b76bdd9"
+    },
+    {
+      "path": "server/index.js",
+      "oid": "30dd6f94e21a6f01fa4d5eb955f35b4db12b926c",
+      "sha256": "b29263107a314d7baf6d27787ced596b3ef2b3c9caff9c7983424d88301f69df"
+    },
+    {
+      "path": "server/middleware/auth.js",
+      "oid": "55bf3eb3beea3793b8022401f08fcfeca389ef92",
+      "sha256": "a9efea15c53878a0de74ba688eaf5bcb34ce5c74177726d5b2703874e18fa3b0"
+    },
+    {
+      "path": "server/migrate.js",
+      "oid": "46aa3082a222174e01ae9f4c3da522ed77a9076a",
+      "sha256": "f6487594d5ea60f3d622a2b557ef952d585c7c29c93bb2a18c7e69bde636690e"
+    },
+    {
+      "path": "server/monitoring/energy.js",
+      "oid": "7cc261f666f46127f24120e9ba4071c1f5e13204",
+      "sha256": "79fe0c0d8bc17f0ad1cffa752c9877136c8632b491dcbe18d8a8123aa1a1ae9f"
+    },
+    {
+      "path": "server/monitoring/errors.js",
+      "oid": "1c4b7eac28107ce6912e8e5e8e5168c4ece9b9f3",
+      "sha256": "9eb88afc671ad6a6701e0e850f0db421467b271b9ffa9730435b4c6ed423d00a"
+    },
+    {
+      "path": "server/monitoring/freshness.js",
+      "oid": "700cadbce5efe070cee579c288650de2b4ca6bba",
+      "sha256": "a5388a50e742944ea6406a2c570084e3515a14f604f7e0e553ae00f93790b062"
+    },
+    {
+      "path": "server/monitoring/operational.js",
+      "oid": "adaa658171475c6d5c589298767382651c560fe7",
+      "sha256": "fa5aabe68050fc07f9299a86a3a14e3b7dd36f24de7323640091ac550bb8429e"
+    },
+    {
+      "path": "server/monitoring/registry.js",
+      "oid": "aa737bd525643f7f525595063271b1d73d960a30",
+      "sha256": "92e4ccd6474f6085ad5affbc1a57fac2cf0d3bfd0eb8f5baaacc461b7b15febc"
+    },
+    {
+      "path": "server/monitoring/routes.js",
+      "oid": "403d02a93c1ad0e290636d27c262d81133ab051f",
+      "sha256": "f86215dbd2f79f49649890728c88fe75f13a6cc34b3f43b7a0e4dfa09e388cb0"
+    },
+    {
+      "path": "server/monitoring/service.js",
+      "oid": "df7644eead3fb78d8ad490b3150645598e50427d",
+      "sha256": "5747cc5799a77849008aef7ceb6015cdadd386c6b3c1769b1080d94b02a3ded6"
+    },
+    {
+      "path": "server/monitoring/time.js",
+      "oid": "e045b847c5a9061dbd3406575522c32e816060f0",
+      "sha256": "e365f2faddbee0ba3f00e9958f2fe7272be9e661f9c5cf4218a4e5ce0b444d66"
+    },
+    {
+      "path": "server/monitoring/units.js",
+      "oid": "7e67f012b700380f7e72c47cf2972d888b688aec",
+      "sha256": "986e1fd9c7c8831a40b8d7d9ed3b008e7f230bc87918a760089ec74f18cda581"
+    },
+    {
+      "path": "server/routes/auth.js",
+      "oid": "adb6fa1e6bbfd1b6b1d42bac1f8224cb50fceaaa",
+      "sha256": "cd63e4ea548de624fd306d0dffbe86e2ba8dd53f84b899459920b9ec93d19ee7"
+    },
+    {
+      "path": "server/routes/data.js",
+      "oid": "3e102b2b6ad2a8ff8cdec93eace33919819562c3",
+      "sha256": "587a45b7530a056c9a476a33140511d71bbac9397fe9aae7c354e436433c6cae"
+    },
+    {
+      "path": "server/routes/export.js",
+      "oid": "cc6fd398512073157a934915b441757fc644d5f4",
+      "sha256": "63a6bd91612f913482c75567dc899b2165ca592cdcc814b73de103ca22680a1e"
+    },
+    {
+      "path": "server/routes/history.js",
+      "oid": "a1c45880356e017dd7bd95a10a11306e78ef8d54",
+      "sha256": "54120bce5b63aa4cda70e7a4c77889af50c46d178bff2812c31aa9e0e26624e1"
+    },
+    {
+      "path": "server/routes/sim-cards.js",
+      "oid": "23871cc7172f0093766910b18241fb0d2f29ca6a",
+      "sha256": "a9b22bdc8ba060757348be3c565ebfe6bac254bad4fcc4cda85db380d5459721"
+    },
+    {
+      "path": "server/services/bluebee-web.js",
+      "oid": "9190fa2c4b2de028b38544cd3eedf7fb207374b9",
+      "sha256": "bb723dce33b999a7f34a82ed9adcd10bf458b63d86c907d681ff9437cb26f624"
+    },
+    {
+      "path": "server/services/control.js",
+      "oid": "5c5662f46478c0425fade66fc2da84c6297f95ce",
+      "sha256": "db271312918e7f037389db4d6efd375a0cecbbea09f461185786c18f88794cab"
+    },
+    {
+      "path": "server/services/emcp.js",
+      "oid": "9ceb03b2183e2994f3fc4491a1e9fdc68d553a49",
+      "sha256": "c475f0a6766d1c3210c7252d4e123714e8ab94ac7f0c1ed94829bb140a1fcbe2"
+    },
+    {
+      "path": "server/services/fetcher.js",
+      "oid": "ac5aab33654ad765cf21134ca50bbcba68b7af4d",
+      "sha256": "551f3bc00e3ce2f445295c7e6e35a705c4a9ff374bfb2a90615247625fd76a7c"
+    },
+    {
+      "path": "server/services/sessions.js",
+      "oid": "8a6bdb881507af796ca374f37264ad05cc14b2f1",
+      "sha256": "721db37b06d587ca1c394462b9f80338640390961f267b08076ea68a449e30b4"
+    },
+    {
+      "path": "server/services/sim-cards.js",
+      "oid": "80f1f59e7e1ec2182ad3ade1cd8780404a650610",
+      "sha256": "dd5926d47294fa8b90d4a77970927da99858723e5a5d82a400879bb3e3185e78"
+    },
+    {
+      "path": "server/services/storage.js",
+      "oid": "9998da0d54225f91a5c4d68979893d03f27bcd96",
+      "sha256": "3bd466ca9340e2cd42226b5bf3e4dbc9ef9f62ec247b07ac83f4ddd69ce4d153"
+    },
+    {
+      "path": "server/utils.js",
+      "oid": "782e9e04705081541866bc6fe49c0c9afbe4fb4f",
+      "sha256": "57d132bbeedd59678822704cbfb9df65ef11bf32e1173efe683d187af39486be"
+    },
+    {
+      "path": "tests/bluebee-web.test.js",
+      "oid": "7190534cf5b879344b2daaf48d410095be24ba91",
+      "sha256": "1e0df5553eb5726c1ddc848ecbcf707989a97921f665cdf977ba5f4520822af2"
+    },
+    {
+      "path": "tests/control.test.js",
+      "oid": "1baa57fa2b46d0859214301470b04dc8a7d1b16f",
+      "sha256": "dcaed83d7becbdb316658f852d64e395d6b1c62a0aed41e1670a2c4280f91ca6"
+    },
+    {
+      "path": "tests/data-contract.test.mjs",
+      "oid": "87230bfb1d9e0c627446a3520a7c8c1e1fbf80e8",
+      "sha256": "f8f35956f54019eba93f53a3104c616f48bbc1b857d06b0e842cace9e4243156"
+    },
+    {
+      "path": "tests/energy.test.mjs",
+      "oid": "8f6291be85698f770f102c34d7111f7c8c191e10",
+      "sha256": "7d9eddf2fdcd0d191c964f0367b4199f86883185c8210b4f66ffcdc6a858a1bc"
+    },
+    {
+      "path": "tests/factory-locations.test.mjs",
+      "oid": "7163f89537122b2b57462ef80a92381d9cefc0e9",
+      "sha256": "85d0a7263689c635fe87bd2f80448768774d1d7b94db48b50d7ead7df4e28f72"
+    },
+    {
+      "path": "tests/factory-row-layout.test.mjs",
+      "oid": "b9e0885183d0ef2d83ebdd9b472494a2ca54ea8d",
+      "sha256": "2ea81bbfc83be6c5d9489af65a14b5965e8ed5917a2f858b657adba60d1454f3"
+    },
+    {
+      "path": "tests/factory-spaces.test.mjs",
+      "oid": "752167e9224b0c88924874ef6f44376e21c673c3",
+      "sha256": "7b1ad04e44fbee283d1cd4d8ddcba282b38b4dd3bc224cb08eed8e6a4bc706e2"
+    },
+    {
+      "path": "tests/frontend-api.test.mjs",
+      "oid": "589bc171e5781e10dda52ea520bf3823fe06f80c",
+      "sha256": "edfeef38443d846f26eada95541c41e814bef30f4aebdf02e50ceb738d082766"
+    },
+    {
+      "path": "tests/home-inspection.test.mjs",
+      "oid": "bdc128fced31ce7a623f2dd36567a2a07c180aff",
+      "sha256": "7f96156baf9101ba80616b9d2bcc2032727bdedc5a1233795b93b3e9882a91e7"
+    },
+    {
+      "path": "tests/map-projection.test.mjs",
+      "oid": "c269e377d47db6e7ef38bf2f1a711c20b371e62b",
+      "sha256": "c6db107b23de96e0ff8860805d69df763e6869a481274fa1666e733b06ba0a4d"
+    },
+    {
+      "path": "tests/map-terrain-geometry.test.mjs",
+      "oid": "8f2248a49ff2a84de0d324eb8addac8b430b0cd5",
+      "sha256": "25b17435c5645ba995166f08b45dd691499f5c2dd3377689b549d17fcaa88efb"
+    },
+    {
+      "path": "tests/map-terrain.test.mjs",
+      "oid": "99987255a2d2aa8c6f9adc4cf6d4f4cd1d044301",
+      "sha256": "a62f505eb9e74971a8b62f896049488a6dd4d0ced381dbffad4e65f908248fee"
+    },
+    {
+      "path": "tests/monitoring-foundation.test.js",
+      "oid": "3c40720ccb23970d975a65c71a492ee7d0deeefa",
+      "sha256": "674e6de961593b7c3c737028e13fb145504fc0e39407bcc56f3c27aa24804d96"
+    },
+    {
+      "path": "tests/monitoring-operation-semantics.test.js",
+      "oid": "20e29d55414af8151c82af7bfde0b6ce23190632",
+      "sha256": "8bb03f0444b3e3f15f1a3c3136752ec32b7bbbad8524ed6bb8a083ae58678e2c"
+    },
+    {
+      "path": "tests/room-inspection.test.mjs",
+      "oid": "3e7dd8193b2bf818c7c6db37e82e23c4df75d228",
+      "sha256": "3b5f9a20ba18703d6b7083c8db29387d21d69f074acab480d15dfa54d9900c00"
+    },
+    {
+      "path": "tests/room-temperature-history.test.mjs",
+      "oid": "4aae93da8c11a959cc933630ab35a149744f4a32",
+      "sha256": "28bfe62ed713d4cf965aeffd0503daf21264e0da8011a526a64e8c15c28c7e31"
+    },
+    {
+      "path": "tests/session-routes.test.js",
+      "oid": "e2d43754cd9219155c5aeaf72a0a6cae1467c506",
+      "sha256": "72e5eaf211629df3375d239480c6a792d25dad1bafea1d76748d20f8ce7c5e5b"
+    },
+    {
+      "path": "tests/sessions.test.js",
+      "oid": "9269d9e16b05fc4bf0a20b17b581942889d1e85f",
+      "sha256": "ae3010a352f49deb5142a4b8de390841fbea6897dd99591ed33e21b34e4a32c2"
+    },
+    {
+      "path": "tests/sim-card-view-model.test.mjs",
+      "oid": "e09de4032f778738ea44281c937e9c3ee70b7d8e",
+      "sha256": "86251d56a3a5ca02a5ee869aa3211d03b0a3cd594b6f1bbd187edec0cd2f73ce"
+    },
+    {
+      "path": "tests/sim-cards.test.js",
+      "oid": "ff5a835524b026062b809a9f5409bde74c8c7a8e",
+      "sha256": "74b6f4267a64b5bf4b4daef9b43742f6712e5c5522a768e5efad1e287a1981c1"
+    },
+    {
+      "path": "tests/site-overview.test.mjs",
+      "oid": "4fb5c2b03da5aa9091c38447624c1ca3efeb1290",
+      "sha256": "06d3598a623868148ae70e90b9f5ce82d108b98b68111c5333cf80e8115c1a2f"
+    },
+    {
+      "path": "tests/trend-data.test.mjs",
+      "oid": "9b200a9efa50253b3cf3f477d81412397773fcbf",
+      "sha256": "3ed2d4599ea3f8b6c65c5b559327fe71368790275f8243deaa4f3c5a4ba05eb7"
+    },
+    {
+      "path": "tests/unit-inspection.test.mjs",
+      "oid": "c33bafc784afc7f127ad897d6c126b6b1c35793e",
+      "sha256": "5555d04126bfd651d4d7f67526834f849fb81c63fb045bd95767464706d55790"
+    },
+    {
+      "path": "tests/unit-topology.test.mjs",
+      "oid": "8a8aca3c49018e3df9fdfc5548cd5b3d7aec74fd",
+      "sha256": "b16065a3111b2c92b8171e53f8d2186d82facd7a974254dd8df67210ad740d5d"
+    }
+  ],
+  "missing": [
+    "frontend/preview/FactoryPreview.vue",
+    "frontend/preview/UnitPreview.vue",
+    "frontend/preview/compare.html",
+    "frontend/preview/factory.html",
+    "frontend/preview/main.js",
+    "frontend/preview/references/desktop-target.png",
+    "frontend/preview/references/mobile-target.png",
+    "frontend/preview/screens/comparison-desktop.jpg",
+    "frontend/preview/screens/comparison-mobile.jpg",
+    "frontend/preview/screens/comparison-typography.jpg",
+    "frontend/preview/screens/desktop-before-polish.jpg",
+    "frontend/preview/screens/desktop.jpg",
+    "frontend/preview/screens/mobile-detail.jpg",
+    "frontend/preview/screens/mobile-first.jpg",
+    "frontend/preview/screens/mobile.jpg",
+    "frontend/preview/screens/site-factory-desktop.jpg",
+    "frontend/preview/screens/site-factory-mobile.jpg",
+    "frontend/preview/screens/tablet.jpg",
+    "frontend/preview/site-fixtures.js",
+    "frontend/preview/site-main.js",
+    "frontend/preview/site.html",
+    "frontend/preview/temperature-fixtures.js",
+    "frontend/preview/units-main.js",
+    "frontend/preview/units.html",
+    "frontend/scripts/guard-production-build.js",
+    "frontend/scripts/split-styles.mjs",
+    "previews/xinshao-twin/.gitignore",
+    "previews/xinshao-twin/README.md",
+    "previews/xinshao-twin/design-qa.md",
+    "previews/xinshao-twin/index.html",
+    "previews/xinshao-twin/package-lock.json",
+    "previews/xinshao-twin/package.json",
+    "previews/xinshao-twin/scripts/serve.mjs",
+    "previews/xinshao-twin/vite.config.js"
+  ]
+}
