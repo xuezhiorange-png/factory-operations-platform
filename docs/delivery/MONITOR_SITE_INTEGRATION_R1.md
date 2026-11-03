@@ -126,7 +126,9 @@ It vendors the clean reusable-code commit
 `dba043667970e6019dbdc7a8420969d82411d090` (37 source files, per-file hashes).
 `monitor-integration-r1/monitor-bridge.patch` contains the other 15 bridge files
 for review/application to that exact real source. It is not an invented monitor
-app. First check the real monitor base and patch applicability; then export the
+app. The generated patch uses zero context lines (avoiding whitespace-only lines
+inside a tracked patch artifact). Require the exact base and check with
+`git apply --check --index --unidiff-zero` before any application. Then export the
 pinned reusable module into the absent `frontend/vendor/factory-operations-portal`
 directory. Do not apply a patch to an unverified/dirty project or server.
 

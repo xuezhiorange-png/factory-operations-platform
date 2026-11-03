@@ -92,78 +92,39 @@ diff --git a/frontend/src/components/AppIcon.vue b/frontend/src/components/AppIc
 index 8d35fa1..252f7f4 100644
 --- a/frontend/src/components/AppIcon.vue
 +++ b/frontend/src/components/AppIcon.vue
-@@ -1,5 +1,6 @@
- <template>
+@@ -2 +2,2 @@
 -  <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 +  <Wrench v-if="name === 'operations'" class="app-icon" aria-hidden="true" />
 +  <svg v-else class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-     <template v-if="name === 'overview'">
-       <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
-       <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
-@@ -49,5 +50,6 @@
- </template>
- 
- <script setup>
+@@ -51,0 +53 @@
 +import { Wrench } from '@lucide/vue'
- defineProps({ name: { type: String, required: true } })
- </script>
 diff --git a/frontend/src/components/DeviceModal.vue b/frontend/src/components/DeviceModal.vue
 index 948c8ab..4789055 100644
 --- a/frontend/src/components/DeviceModal.vue
 +++ b/frontend/src/components/DeviceModal.vue
-@@ -4,6 +4,7 @@
-       <template #temperature-trend="{ room, threshold }"><RoomTemperatureTrend :key="roomKey(room)" :room="room" :rooms="historyRooms" :threshold="threshold" :load-history="temperatureHistory.load"/></template>
-       <template #sim-cards><SimCards v-if="auth.role === 'admin'" embedded :equipment-ids="device?.sourceEquipmentIds || []"/></template>
-       <template #space><FactorySpaceView v-if="factorySpace" :space="factorySpace" /></template>
+@@ -6,0 +7 @@
 +      <template #operations><button class="fi-icon-button" aria-label="查看设备运维档案" title="设备运维档案" @click="openOperations"><Wrench :size="18" /></button></template>
-       <template #units>
-         <UnitOverview :units="jizus" :read-only="!auth.isAdmin" :busy="saving || !!busyRoom" :error="data.lastError" :demo="designPreview" @temperature="({ unit, type }) => openJizuTempPicker(unit, type)" />
-       </template>
-@@ -57,6 +58,8 @@ import { api } from '../api'
- import { cleanName, deviceSuffix, gPow, FLAGSHIP_MAP } from '../utils'
- import { canConfigureUnitTarget, unitIdentity } from '../unit-inspection'
- import { createTemperatureHistoryLoader } from '../room-temperature-history'
+@@ -59,0 +61,2 @@ import { createTemperatureHistoryLoader } from '../room-temperature-history'
 +import { Wrench } from '@lucide/vue'
 +import { operationsRouteForGateways } from '../operations-monitor'
- 
- defineProps({ initialView: { type: String, default: 'rooms' } })
- const RoomTemperatureTrend = defineAsyncComponent({
-@@ -202,6 +205,11 @@ function navigate(path) {
-   close()
-   if (!visible.value) router.push(path)
- }
+@@ -204,0 +208,5 @@ function navigate(path) {
 +function openOperations() {
 +  const destination = operationsRouteForGateways(device.value?.sourceEquipmentIds)
 +  close()
 +  if (!visible.value) router.push(destination)
 +}
- 
- async function loadDetails() {
-   const name = device.value?.isGroup ? device.value.name : device.value?.name
 diff --git a/frontend/src/components/FactoryMonitor.vue b/frontend/src/components/FactoryMonitor.vue
 index 9bc9d78..6492406 100644
 --- a/frontend/src/components/FactoryMonitor.vue
 +++ b/frontend/src/components/FactoryMonitor.vue
-@@ -11,6 +11,7 @@
-         <header class="fi-title-band">
-           <div class="fi-title-group"><button ref="backButton" class="fi-icon-button fi-back" aria-label="返回加工厂列表" title="返回" @click="emit('close')"><ArrowLeft :size="20" /></button><div><p class="fi-eyebrow">加工厂 / {{ activeView === 'space' ? '方案空间' : '冷间监控' }}</p><h1>{{ title || '加工厂' }}<span v-if="brand" class="fi-brand-tag">{{ brand }}</span></h1></div><button v-if="activeView !== 'space'" class="fi-icon-button fi-mobile-fullscreen" :aria-label="fullOverview ? '退出全屏总览' : '全屏显示全部冷间'" :title="fullOverview ? '退出全屏' : '全屏'" @click="toggleFullscreen"><Minimize v-if="fullOverview" :size="17" /><Maximize v-else :size="17" /></button></div>
-           <div v-if="activeView !== 'space'" class="fi-factory-stats"><span>冷间 <b class="fi-number">{{ entries.length }}</b></span><span>超温 <b class="fi-number" :class="{ 'fi-danger': hotCount }">{{ hotCount }}</b></span><span>离线 <b class="fi-number" :class="{ 'fi-warning': offlineCount }">{{ offlineCount }}</b></span><span class="fi-energy">今日用电 <b class="fi-number">{{ format(todayPower) }}<small>kWh</small></b></span></div>
+@@ -13,0 +14 @@
 +          <slot name="operations" />
-         </header>
- 
-         <div v-if="error" class="fi-error" role="status">{{ error }}<button :disabled="refreshing" @click="emit('refresh')">重试</button></div>
 diff --git a/frontend/src/components/MobileNav.vue b/frontend/src/components/MobileNav.vue
 index 133fa9c..87bcf13 100644
 --- a/frontend/src/components/MobileNav.vue
 +++ b/frontend/src/components/MobileNav.vue
-@@ -112,6 +112,7 @@ const navItems = [
-   { page: '/devices', icon: 'devices', label: '设备' },
-   { page: '/alarms', icon: 'alarms', label: '报警' },
-   { page: '/power', icon: 'energy', label: '能耗' },
+@@ -114,0 +115 @@ const navItems = [
 +  { page: '/operations', icon: 'operations', label: '运维' },
- ]
- 
- function isActive(page) { return page === '/' ? route.path === '/' : route.path.startsWith(page) }
 diff --git a/frontend/src/components/OperationsMonitorLink.vue b/frontend/src/components/OperationsMonitorLink.vue
 new file mode 100644
 index 0000000..b92d488
@@ -201,14 +162,8 @@ diff --git a/frontend/src/navigation.ts b/frontend/src/navigation.ts
 index 0d57a9b..4b3d657 100644
 --- a/frontend/src/navigation.ts
 +++ b/frontend/src/navigation.ts
-@@ -10,6 +10,7 @@ export const primaryNavigation: NavItem[] = [
-   { page: '/devices', icon: 'devices', label: '设备管理' },
-   { page: '/alarms', icon: 'alarms', label: '报警中心' },
-   { page: '/power', icon: 'energy', label: '能耗分析' },
+@@ -12,0 +13 @@ export const primaryNavigation: NavItem[] = [
 +  { page: '/operations', icon: 'operations', label: '设备运维' },
- ]
- 
- export const managementNavigation: NavItem[] = [
 diff --git a/frontend/src/operations-monitor.js b/frontend/src/operations-monitor.js
 new file mode 100644
 index 0000000..0ccc4c7
@@ -929,69 +884,34 @@ diff --git a/frontend/src/router.js b/frontend/src/router.js
 index 859aeb8..918ef19 100644
 --- a/frontend/src/router.js
 +++ b/frontend/src/router.js
-@@ -1,6 +1,8 @@
- import { createRouter, createWebHistory } from 'vue-router'
+@@ -1,0 +2 @@ import { createRouter, createWebHistory } from 'vue-router'
 +import { createOperationsRoutes } from '../vendor/factory-operations-portal/src/integrations/monitor'
- 
- export const routes = [
+@@ -3,0 +5 @@ export const routes = [
 +  ...createOperationsRoutes(),
-   { path: '/', name: 'dashboard', component: () => import('./views/CommandCenter.vue') },
-   { path: '/devices', name: 'devices', component: () => import('./views/Devices.vue') },
-   { path: '/alarms', name: 'alarms', component: () => import('./views/Alarms.vue') },
 diff --git a/frontend/src/views/CommandCenter.vue b/frontend/src/views/CommandCenter.vue
 index 50b603a..4a46eaa 100644
 --- a/frontend/src/views/CommandCenter.vue
 +++ b/frontend/src/views/CommandCenter.vue
-@@ -55,7 +55,7 @@
- </template>
- <script setup>
- import { computed, defineAsyncComponent, inject, nextTick, onMounted, onUnmounted, ref } from 'vue'
+@@ -58 +58 @@ import { computed, defineAsyncComponent, inject, nextTick, onMounted, onUnmounte
 -import { Activity, ArrowUpRight, BarChart3, Bell, CalendarDays, Check, ChevronDown, ChevronRight, Code2, Ellipsis, FileText, LayoutGrid, Monitor, RefreshCw, Search, Settings, ShieldCheck, UserRound, X, Zap } from '@lucide/vue'
 +import { Activity, ArrowUpRight, BarChart3, Bell, CalendarDays, Check, ChevronDown, ChevronRight, Code2, Ellipsis, FileText, LayoutGrid, Monitor, RefreshCw, Search, Settings, ShieldCheck, UserRound, Wrench, X, Zap } from '@lucide/vue'
- import { useAuthStore } from '../stores/auth'
- import { useDataStore } from '../stores/data'
- import { managementNavigation, primaryNavigation } from '../navigation'
-@@ -71,7 +71,7 @@ const data = useDataStore(), auth = useAuthStore(), showDevice = inject('showDev
- const now = ref(Date.now()), alarmFilter = ref(''), alarmPeriod = ref(''), alarmSort = ref('priority'), alarmMenu = ref(null)
- const baseStatus = ref(''), baseMeasure = ref('count'), connectionBase = ref('')
- const directory = ref(null), directorySearch = ref(null), search = ref(''), directoryBase = ref(''), factoryFilter = ref('')
+@@ -74 +74 @@ const directory = ref(null), directorySearch = ref(null), search = ref(''), dire
 -const navIcons = { overview: LayoutGrid, devices: Monitor, alarms: Bell, energy: Zap, report: FileText, activity: Activity, settings: Settings, devlog: Code2 }
 +const navIcons = { overview: LayoutGrid, devices: Monitor, alarms: Bell, energy: Zap, report: FileText, activity: Activity, settings: Settings, devlog: Code2, operations: Wrench }
- const railNavigation = computed(() => [...primaryNavigation, ...managementNavigation.filter(item => !item.adminOnly || auth.isAdmin)])
- const summary = computed(() => siteSummary(data.devices))
- const bases = computed(() => [...new Set(summary.value.factories.map(factory => factory.brand || '未分类'))].sort((a,b) => a.localeCompare(b,'zh-CN')))
 diff --git a/frontend/src/views/Devices.vue b/frontend/src/views/Devices.vue
 index 951cb31..dd840f5 100644
 --- a/frontend/src/views/Devices.vue
 +++ b/frontend/src/views/Devices.vue
-@@ -1,6 +1,7 @@
- <template>
-   <div class="workspace-view device-workspace">
-     <WorkspaceHeader title="设备管理" section="设备与冷间" />
+@@ -3,0 +4 @@
 +    <OperationsMonitorLink v-if="$route.query.ops_factory || $route.query.ops_asset" @open="openDevice" />
-     <section class="device-summary-band" aria-label="设备状态分布"><div><Monitor :size="20"/><strong>{{ data.devices.length }}</strong><span>接入设备</span></div><div><i class="status-dot is-online"/><strong>{{ data.onlineCount }}</strong><span>在线</span></div><div><i class="status-dot is-offline"/><strong>{{ data.devices.length-data.onlineCount }}</strong><span>离线</span></div><div><Thermometer :size="19"/><strong>{{ roomCount }}</strong><span>冷间</span></div></section>
-     <div class="device-toolbar"><label class="search-field"><Search :size="16"/><input v-model="query" type="search" placeholder="搜索设备或冷间" aria-label="搜索设备"></label><div class="segmented" role="group" aria-label="设备状态筛选"><button v-for="item in statusOptions" :key="item.value" :aria-pressed="status===item.value" @click="status=item.value">{{ item.label }}</button></div><span class="device-result-count">{{ devices.length }} 台设备</span></div>
-     <div v-if="!devices.length" class="empty" role="status">{{ data.loading ? '加载中…' : data.lastError ? '设备数据读取失败' : '没有符合条件的设备' }}</div>
-@@ -25,6 +26,7 @@ import { cleanName, deviceSuffix, fP } from '../utils'
- import { reading } from '../energy'
- import { inspectRoom } from '../room-inspection'
- import WorkspaceHeader from '../components/WorkspaceHeader.vue'
+@@ -27,0 +29 @@ import WorkspaceHeader from '../components/WorkspaceHeader.vue'
 +import OperationsMonitorLink from '../components/OperationsMonitorLink.vue'
- const data = useDataStore()
- const showDevice = inject('showDevice')
- const query = ref(''), status = ref('')
 diff --git a/frontend/vite.config.js b/frontend/vite.config.js
 index 843f1f2..a664c31 100644
 --- a/frontend/vite.config.js
 +++ b/frontend/vite.config.js
-@@ -15,6 +15,7 @@ export default defineConfig({
-   },
-   server: {
-     proxy: {
+@@ -17,0 +18 @@ export default defineConfig({
 +      '/operations-api': { target: process.env.OPERATIONS_API_DEV_TARGET || 'http://127.0.0.1:8016', rewrite: path => path.replace(/^\/operations-api\/v1(?=\/)/, '/api/v1') },
-       '/api': 'http://localhost:3001',
-       '/manifest.json': 'http://localhost:3001',
-       '/icon.svg': 'http://localhost:3001',
 diff --git a/scripts/export-operations-registry.cjs b/scripts/export-operations-registry.cjs
 new file mode 100644
 index 0000000..2ac6774
