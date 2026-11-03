@@ -102,8 +102,8 @@ def main():
                 )
             return response
 
-        # Only the real monitor frontend is served by Vite. Its network fixture is
-        # empty/read-only and cannot authenticate monitor control-capable accounts.
+        # Only the real monitor frontend is served by Vite. Synthetic navigation
+        # readings cannot authenticate control-capable accounts or call hardware.
         @app.post("/api/login")
         async def monitor_login(request: Request):
             body = await request.json()
@@ -123,7 +123,33 @@ def main():
 
         @app.get("/api")
         def monitor_data():
-            return JSONResponse({"devices": []}, headers={"X-Data-Acquired-At": "0"})
+            return JSONResponse(
+                {
+                    "devices": [
+                        {
+                            "id": "NAV_TEST",
+                            "name": "合成导航测试厂",
+                            "online": True,
+                            "alarms": [],
+                            "power": {},
+                            "coldRooms": [
+                                {
+                                    "name": f"合成冷间 {index:02d}",
+                                    "temp": 1.2,
+                                    "status": "开启",
+                                    "startTemp": 2.0,
+                                    "stopTemp": 0.5,
+                                    "fan1Status": "运行",
+                                    "zhuanliu1Status": "运行",
+                                    "guoXinTemps": [1.1, 1.3],
+                                }
+                                for index in range(1, 18)
+                            ],
+                        }
+                    ]
+                },
+                headers={"X-Data-Acquired-At": "0"},
+            )
 
         @app.get("/api/{path:path}")
         def monitor_empty(path: str):

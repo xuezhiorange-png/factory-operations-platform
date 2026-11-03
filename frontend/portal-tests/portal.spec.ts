@@ -69,3 +69,26 @@ test('losing the personal session clears previously visible data', async ({ page
   await expect(page.getByRole('heading', { name: '统一登录待接入' })).toBeVisible();
   await expect(page.locator('.asset-data-row')).toHaveCount(0);
 });
+
+test('disconnected entry never requests business or identity APIs despite a valid personal cookie', async ({ page }) => {
+  await persona(page, 'group');
+  const requests: string[] = [];
+  page.on('request', request => { if (request.url().includes('/operations-api/')) requests.push(request.url()); });
+  await page.goto('/operations/assets?connected=false');
+  await expect(page.getByRole('heading', { name: '设备运维待接入' })).toBeVisible();
+  await page.getByRole('link', { name: '维修工单 待开发' }).click();
+  await expect(page.getByRole('heading', { name: '设备运维待接入' })).toBeVisible();
+  await expect(page.locator('.asset-data-row, .people-table')).toHaveCount(0);
+  expect(requests).toEqual([]);
+});
+
+test('disconnected deep link does not load an asset or monitoring association', async ({ page }) => {
+  const ids = await (await page.request.get('/__portal_test__/ids')).json();
+  await persona(page);
+  const requests: string[] = [];
+  page.on('request', request => { if (request.url().includes('/operations-api/')) requests.push(request.url()); });
+  await page.goto(`/operations/assets/${ids.assets.A}?factory=${ids.factories.A}&connected=false`);
+  await expect(page.getByRole('heading', { name: '设备运维待接入' })).toBeVisible();
+  await expect(page.locator('.detail-fields')).toHaveCount(0);
+  expect(requests).toEqual([]);
+});

@@ -1,5 +1,25 @@
 # FACTORY_OPS_MONITOR_SITE_INTEGRATION_R1
 
+## Authorized Follow-Up: Navigation and Disconnected Entry
+
+On 2026-11-03 the user requested consistent site navigation and authorized a
+frontend release **including the operations entry in disconnected mode**, without
+business data. This does not authorize backend deployment, personal SSO bypass,
+new database/API services, Ready or Merge.
+
+The native route factory now accepts `{ connected: false }`. That mode clears the
+module's client identity state, renders `设备运维待接入`, mounts no business child,
+and performs no identity, asset, personnel or link requests, even when a valid
+personal cookie already exists. It is a release circuit breaker, not an
+authorization substitute. Connected mode retains every original backend check.
+Two additional browser tests cover list/module navigation and deep-link cases.
+The synthetic-only fixture can also show 17 clearly named synthetic monitoring
+rooms for factory navigation/fullscreen checks; it cannot authenticate a monitor
+control-capable account. No such fixtures are part of the production bundle.
+
+Original R1 evidence below remains a historical record. Updated exact-head CI and
+the separately versioned navigation frontend release are reported on the PR.
+
 ## Authorization and Baseline
 
 - User authorization: implement a native module in the existing monitoring site;

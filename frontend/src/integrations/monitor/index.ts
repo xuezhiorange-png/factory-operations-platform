@@ -12,11 +12,12 @@ export const operationsModules = [
   { path: 'settings', title: '运维设置', icon: 'Settings2', ready: true },
 ] as const;
 
-export function createOperationsRoutes(): RouteRecordRaw[] {
+export function createOperationsRoutes(options: { connected?: boolean } = {}): RouteRecordRaw[] {
   enableMonitorPortal();
   return [{
     path: '/operations',
     component: () => import('./OperationsPortal.vue'),
+    props: { connected: options.connected !== false },
     redirect: '/operations/assets',
     meta: { title: '设备运维' },
     children: [
