@@ -11,6 +11,7 @@ from factory_ops.application.access import AccessService
 from factory_ops.application.assets import AssetQueries
 from factory_ops.application.auth import AuthService, AuthSettings
 from factory_ops.application.mcp import ReadOnlyAssetMcp
+from factory_ops.application.monitor_links import parse_monitor_links
 from factory_ops.infrastructure.database.access import SqlAccessUnitOfWork
 from factory_ops.infrastructure.database.auth import SqlAuthUnitOfWork
 from factory_ops.infrastructure.database.uow import SqlReadUnitOfWork
@@ -54,6 +55,7 @@ def configured_app():
         access_service=AccessService(lambda: SqlAccessUnitOfWork(engine)) if auth else None,
         mcp_service=mcp,
         mcp_public_origin=mcp_public_origin,
+        monitor_links=parse_monitor_links(os.environ.get("FACTORY_OPS_MONITOR_LINKS_JSON", "[]")),
     )
 
 

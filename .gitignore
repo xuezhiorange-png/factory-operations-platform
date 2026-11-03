@@ -35,5 +35,6 @@ frontend/dist-business/
 frontend/.business-test-results/
 frontend/dist-identity/
 frontend/.identity-test-results/
+frontend/.portal-test-results/
 # Only sanitized gateway result JSON may be uploaded by CI; never track local runtime output.
 /.mcp-gateway-test-results/

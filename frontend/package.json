@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:business": "playwright test --config playwright.business.config.ts",
-    "test:identity": "playwright test --config playwright.identity.config.ts"
+    "test:identity": "playwright test --config playwright.identity.config.ts",
+    "test:portal": "playwright test --config playwright.portal.config.ts"
   },
   "dependencies": {
     "@lucide/vue": "^1.66.0",

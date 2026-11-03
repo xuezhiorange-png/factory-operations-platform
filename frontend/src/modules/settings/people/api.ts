@@ -1,6 +1,7 @@
 import type { Factory } from '../../assets/contracts';
 import type { Role } from '../../identity/account';
 import { csrfHeaders } from '../../identity/account';
+import { operationsApiPath } from '../../../shared/api-path';
 
 export interface Person {
   id: string;
@@ -75,7 +76,7 @@ const validRecord = (value: unknown) =>
   snapshot(value.details.before) &&
   snapshot(value.details.after);
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const result = await fetch('/api/v1/access' + url, {
+  const result = await fetch(operationsApiPath('/access' + url), {
     credentials: 'same-origin',
     cache: 'no-store',
     ...options,

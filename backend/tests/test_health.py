@@ -31,6 +31,8 @@ def test_openapi_exposes_liveness_and_only_scoped_business_reads(client: TestCli
         "/api/v1/access/users/{user_id}/changes",
         "/api/v1/access/users/{user_id}/revoke-sessions",
         "/api/v1/access/users/{user_id}/unbind-feishu",
+        "/api/v1/portal/asset-link",
+        "/api/v1/portal/resolve",
     }
     writes = {
         "/api/v1/auth/logout": "post",

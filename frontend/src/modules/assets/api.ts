@@ -6,6 +6,7 @@ import type {
   AssetsReadPort,
   FactoryList,
 } from './contracts';
+import { operationsApiPath } from '../../shared/api-path';
 
 export class AssetApiError extends Error {
   constructor(public readonly status: number) {
@@ -35,7 +36,7 @@ const asset = (value: unknown): value is Asset =>
   ['pending', 'in_use', 'inactive', 'retired'].includes(String(value.status)) &&
   typeof value.version === 'number';
 async function read(path: string, signal?: AbortSignal): Promise<unknown> {
-  const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store', signal });
+  const response = await fetch(operationsApiPath(path), { credentials: 'same-origin', cache: 'no-store', signal });
   if (!response.ok) throw new AssetApiError(response.status);
   try {
     return (await response.json()) as unknown;
@@ -44,10 +45,10 @@ async function read(path: string, signal?: AbortSignal): Promise<unknown> {
   }
 }
 const factoryPath = (factoryId: string) =>
-  '/api/v1/factories/' + encodeURIComponent(factoryId) + '/assets';
+  '/factories/' + encodeURIComponent(factoryId) + '/assets';
 export const assetsApi: AssetsReadPort = {
   async factories(signal) {
-    const body = await read('/api/v1/factories', signal);
+    const body = await read('/factories', signal);
     if (
       !object(body) ||
       !dataSource(body.data_source) ||
