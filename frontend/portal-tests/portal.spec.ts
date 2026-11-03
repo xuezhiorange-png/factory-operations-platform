@@ -76,6 +76,7 @@ test('disconnected entry never requests business or identity APIs despite a vali
   page.on('request', request => { if (request.url().includes('/operations-api/')) requests.push(request.url()); });
   await page.goto('/operations/assets?connected=false');
   await expect(page.getByRole('heading', { name: '设备运维待接入' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '重新校验运维权限' })).toHaveCount(0);
   await page.getByRole('link', { name: '维修工单 待开发' }).click();
   await expect(page.getByRole('heading', { name: '设备运维待接入' })).toBeVisible();
   await expect(page.locator('.asset-data-row, .people-table')).toHaveCount(0);

@@ -25,7 +25,7 @@ onUnmounted(() => { generation++; clearAccount(); });
       <div class="operations-identity"><AppIcon name="ShieldCheck" :size="17" />
         <span v-if="account.user && !checking">{{ account.user.display_name }}<small>{{ account.user.role ? roleNames[account.user.role] : '待授权' }}</small></span>
         <span v-else>{{ connected ? '个人身份校验' : '运维待接入' }}</span>
-        <button type="button" class="icon-button" title="重新校验运维权限" aria-label="重新校验运维权限" :disabled="checking" @click="check"><AppIcon name="ArrowRight" :size="17" /></button>
+        <button v-if="connected" type="button" class="icon-button" title="重新校验运维权限" aria-label="重新校验运维权限" :disabled="checking" @click="check"><AppIcon name="ArrowRight" :size="17" /></button>
       </div>
     </header>
     <nav class="operations-modules" aria-label="设备运维模块">
